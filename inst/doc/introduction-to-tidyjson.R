@@ -1,8 +1,8 @@
-## ----, echo = FALSE------------------------------------------------------
+## ---- echo = FALSE-------------------------------------------------------
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 options(dplyr.print_min = 4L, dplyr.print_max = 4L)
 
-## ----, message = FALSE---------------------------------------------------
+## ---- message = FALSE----------------------------------------------------
 library(tidyjson)   # this library
 library(dplyr)      # for %>% and other dplyr functions
 
@@ -27,7 +27,7 @@ people %>%                  # %>% is the magrittr pipeline operator
     age = jnumber("age")    # value of "age" becomes a numeric column
   )
 
-## ----, message = FALSE---------------------------------------------------
+## ---- message = FALSE----------------------------------------------------
 library(jsonlite)
 jsonlite::fromJSON(people, simplifyDataFrame = TRUE)
 
@@ -208,7 +208,7 @@ amts %>%
   mutate(spend.dist = spend.portion / sum(spend.portion)) %>%
   arrange(desc(spend.dist))
 
-## ----, fig.width = 7, fig.height = 6-------------------------------------
+## ---- fig.width = 7, fig.height = 6--------------------------------------
 library(ggplot2)
 key_stats <- companies %>% 
   gather_keys %>% json_types %>% group_by(key, type) %>% tally
@@ -217,7 +217,7 @@ ggplot(key_stats, aes(key, n, fill = type)) +
   geom_bar(stat = "identity", position = "stack") +
   coord_flip()
 
-## ----, fig.width = 7, fig.height = 2-------------------------------------
+## ---- fig.width = 7, fig.height = 2--------------------------------------
 companies %>%
   enter_object("funding_rounds") %>%
   gather_array %>% 
@@ -241,7 +241,7 @@ rounds <- companies %>%
   )
 rounds %>% glimpse
 
-## ----, fig.width = 7, fig.height = 2-------------------------------------
+## ---- fig.width = 7, fig.height = 2--------------------------------------
 rounds %>%
   filter(
     !is.na(raised),

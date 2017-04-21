@@ -1,6 +1,6 @@
-d78cdb55e402e68e1e81b199bbdcb4a0 *DESCRIPTION
+2b9edd74d9de534ad913d22b10e3a6c5 *DESCRIPTION
 82282b5df666cf32efc32968cbfbdef3 *LICENSE
-6ef4ca51e51f61f9f30ff2971aa40660 *NAMESPACE
+8d268a9f3f722b2f9659d428b02cda67 *NAMESPACE
 b44984c8c1cede90af26a379c97ffa39 *R/append_values.r
 4be93008e5669db363e1f492f63327ac *R/data-commits.r
 a14f1f6c7c71ad9ba0fcbd8bd240791d *R/data-companies.r
@@ -17,14 +17,14 @@ d68e6445b0abc01d62f40fec17ebcf69 *R/spread_values.r
 581220a3d3151361a6c3103eb44a682b *R/tbl_json.r
 994bdf54d13fedb356737addee181585 *R/tidyjson-package.r
 0bcd58dc1aa51f31a1b14339a7b0976f *README.md
-3b80af120cf4c01ebc406b21c91b44cf *build/vignette.rds
+292564c2922e5aef8482fbb70a741d9b *build/vignette.rds
 d57f756669004c95173bb6fc29d46cda *data/commits.rda
 d55ac307739fade1cffe0c682ad64f53 *data/companies.rda
 f189bef9bbbd1a9a72ae9d9bfbfb5876 *data/issues.rda
 16453c95d07e191d5dcd8f86bf23a069 *data/worldbank.rda
-402e4e5dca84bf04044b75a9b60921de *inst/doc/introduction-to-tidyjson.R
+3e9314be2b215e24b179e1d4a192050a *inst/doc/introduction-to-tidyjson.R
 84650c83fb9dba83b008e7b3daeee33d *inst/doc/introduction-to-tidyjson.Rmd
-ee425ff8ddedb9e19ec09419c25b5e3d *inst/doc/introduction-to-tidyjson.html
+87a726bf6fec60ab5b7840159876742d *inst/doc/introduction-to-tidyjson.html
 02ea7db93ca36c7a050822470c59b367 *inst/extdata/sample.json
 2588fd62e19d51190fbfe1ba40c353ab *inst/extdata/sample.jsonl
 2588fd62e19d51190fbfe1ba40c353ab *inst/extdata/sample_jsonl
@@ -54,7 +54,6 @@ d6925e5f45cded3a545ed824632a1420 *man/sub-.tbl_json.Rd
 86f550346b713139fc1749f96340f708 *man/tidyjson.Rd
 270136d608be6a92dbbff303e33ea5b8 *man/worldbank.Rd
 85434c2caec34063a84da7246a051bf9 *man/wrap_dplyr_verb.Rd
-7f7b770b51fa8fcd0c3e0ee228735b9c *tests/test-all.r
 1271a6d7fc6c16261b61703f365c413b *tests/testthat/test-append_values.r
 d6310e4bd9d416d43eb3749823c0898f *tests/testthat/test-enter_object.r
 a847c2229da35d8c23f00bea2e852158 *tests/testthat/test-gather_array.r
