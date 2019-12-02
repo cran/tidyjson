@@ -7,59 +7,292 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<meta name="author" content="Jeremy Stanley" />
 
-<meta name="date" content="2017-04-21" />
+<meta name="date" content="2019-11-28" />
 
 <title>Introduction to tidyjson</title>
 
 
 
 <style type="text/css">code{white-space: pre;}</style>
-<style type="text/css">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#header {
+text-align: center;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
 </style>
 
 
 
-<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
 
 </head>
 
@@ -69,262 +302,147 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 
 <h1 class="title toc-ignore">Introduction to tidyjson</h1>
-<h4 class="author"><em>Jeremy Stanley</em></h4>
-<h4 class="date"><em>2017-04-21</em></h4>
+<h4 class="date">2019-11-28</h4>
 
 
 
 <p><a href="http://json.org/">JSON</a> (JavaScript Object Notation) is a lightweight and flexible data format that is easy for humans to read and for machines to parse. JSON has become a common format used in:</p>
 <ul>
-<li>Public APIs (e.g., <a href="https://dev.twitter.com/rest/public">Twitter</a>)</li>
-<li>NoSQL databases as a document format (e.g., <a href="https://www.mongodb.org/">MongoDB</a>)</li>
-<li>Relational databases as a new column type (e.g., <a href="http://www.postgresql.org/docs/9.4/static/datatype-json.html">PostgreSQL</a>)</li>
+<li><p>Public APIs (e.g., <a href="https://dev.twitter.com/rest/public">Twitter</a>)</p></li>
+<li><p>NoSQL databases as a document format (e.g., <a href="https://www.mongodb.org/">MongoDB</a>)</p></li>
+<li><p>Relational databases as a new column type (e.g., <a href="http://www.postgresql.org/docs/9.4/static/datatype-json.html">PostgreSQL</a>)</p></li>
 </ul>
-<p>The tidyjson package provides a grammar for turning JSON data into tidy data.frames that are easy to work with in dplyr, ggplot2 and other modeling and analytics packages.</p>
+<p>Tidyjson provides a grammar for turning complex JSON data into tidy data frames that are easy to work with in the <a href="https://github.com/hadley/tidyverse">tidyverse</a>.</p>
 <div id="why-use-tidyjson" class="section level2">
 <h2>Why use tidyjson?</h2>
-<p>There are already several libraries for working with JSON data in R, such as <a href="http://cran.r-project.org/web/packages/rjson/index.html">rjson</a>, <a href="http://cran.r-project.org/web/packages/RJSONIO/index.html">rjsonio</a> and <a href="http://cran.r-project.org/web/packages/jsonlite/index.html">jsonlite</a>. Using these libraries, you can transform JSON into a nested R list. However, working with nested lists using base R functionality is difficult.</p>
-<p>The jsonlite package goes farther by automatically creating a nested R data.frame. This is easier to work with than a list, but has two main limitations. First, the resulting data.frame isn’t <a href="http://vita.had.co.nz/papers/tidy-data.pdf">tidy</a>, and so it can still be difficult to work with. Second, the structure of the data.frame may vary as the JSON sample changes, which can happen any time you change the database query or API call that generated the data.</p>
-<p>The tidyjson package takes an alternate approach to structuring JSON data into tidy data.frames. Similar to <a href="http://cran.r-project.org/web/packages/tidyr/index.html">tidyr</a>, tidyjson builds a grammar for manipulating JSON into a tidy table structure. Tidyjson is based on the following principles:</p>
+<p>Several libraries exist for working with JSON data in R, such as <a href="https://cran.r-project.org/package=rjson">rjson</a>, <a href="https://cran.r-project.org/package=RJSONIO">rjsonio</a> and <a href="https://cran.r-project.org/package=jsonlite">jsonlite</a>. These libraries transform JSON data automatically into nested R lists or complex data frames. However, working with these complex objects can be difficult.</p>
+<p>The tidyjson package takes a different approach to structuring JSON data into tidy data frames. Similar to <a href="https://cran.r-project.org/package=tidyr">tidyr</a>, tidyjson builds a grammar for manipulating JSON into a tidy table structure.</p>
+<p>Tidyjson is based on the following principles:</p>
 <ul>
-<li>Leverage other libraries for efficiently parsing JSON (<a href="http://cran.r-project.org/web/packages/jsonlite/index.html">jsonlite</a>)</li>
-<li>Integrate with pipelines built on <a href="http://cran.r-project.org/web/packages/dplyr/index.html">dplyr</a> and the <a href="http://cran.r-project.org/web/packages/magrittr/index.html">magrittr</a> <code>%&gt;%</code> operator</li>
-<li>Turn arbitrarily complex and nested JSON into tidy data.frames that can be joined later</li>
-<li>Guarantee a deterministic data.frame column structure</li>
-<li>Naturally handle ‘ragged’ arrays and / or objects (varying lengths by document)</li>
-<li>Allow for extraction of data in values <em>or</em> key names</li>
-<li>Ensure edge cases are handled correctly (especially empty data)</li>
+<li><p>Work on a single JSON document, or on a collection of related documents</p></li>
+<li><p>Create pipelines with <code>%&gt;%</code>, producing code that can be read from left to right</p></li>
+<li><p>Guarantee the structure of the data produced, even if the input JSON structure changes (with the exception of <code>spread_all</code>)</p></li>
+<li><p>Work with arbitrarily nested arrays or objects</p></li>
+<li><p>Handle ‘ragged’ arrays and / or objects (varying lengths by document)</p></li>
+<li><p>Allow for extraction of data in values or object names</p></li>
+<li><p>Ensure edge cases are handled correctly (especially empty data)</p></li>
+<li><p>Integrate seamlessly with <code>dplyr</code>, allowing <code>tbl_json</code> objects to pipe in and out of <code>dplyr</code> verbs where reasonable</p></li>
 </ul>
 </div>
 <div id="a-simple-example" class="section level2">
 <h2>A simple example</h2>
 <p>A simple example of how tidyjson works is as follows:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tidyjson)   <span class="co"># this library</span>
-<span class="kw">library</span>(dplyr)      <span class="co"># for %&gt;% and other dplyr functions</span>
-
-<span class="co"># Define a simple JSON array of people</span>
-people &lt;-<span class="st"> '</span>
-<span class="st">[</span>
-<span class="st">  {</span>
-<span class="st">    &quot;name&quot;: &quot;bob&quot;,</span>
-<span class="st">    &quot;age&quot;: 32</span>
-<span class="st">  }, </span>
-<span class="st">  {</span>
-<span class="st">    &quot;name&quot;: &quot;susan&quot;, </span>
-<span class="st">    &quot;age&quot;: 54</span>
-<span class="st">  }</span>
-<span class="st">]'</span>
-
-<span class="co"># Structure the data</span>
-people %&gt;%<span class="st">                  </span><span class="co"># %&gt;% is the magrittr pipeline operator </span>
-<span class="st">  </span>gather_array %&gt;%<span class="st">          </span><span class="co"># gather (stack) the array by index</span>
-<span class="st">  </span><span class="kw">spread_values</span>(            <span class="co"># spread (widen) values to widen the data.frame</span>
-    <span class="dt">name =</span> <span class="kw">jstring</span>(<span class="st">&quot;name&quot;</span>), <span class="co"># value of &quot;name&quot; becomes a character column</span>
-    <span class="dt">age =</span> <span class="kw">jnumber</span>(<span class="st">&quot;age&quot;</span>)    <span class="co"># value of &quot;age&quot; becomes a numeric column</span>
-  )
-<span class="co">#&gt;   document.id array.index  name age</span>
-<span class="co">#&gt; 1           1           1   bob  32</span>
-<span class="co">#&gt; 2           1           2 susan  54</span></code></pre></div>
-<p>In such a simple example, we can use <code>fromJSON</code> in the jsonlite package to do this much faster:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(jsonlite)
-jsonlite::<span class="kw">fromJSON</span>(people, <span class="dt">simplifyDataFrame =</span> <span class="ot">TRUE</span>)
-<span class="co">#&gt;    name age</span>
-<span class="co">#&gt; 1   bob  32</span>
-<span class="co">#&gt; 2 susan  54</span></code></pre></div>
-<p>However, if the structure of the JSON data changed, so would the columns output by <code>fromJSON</code>. So even in this simple example there is value in the explicit structure defined in the tidyjson pipeline above.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(dplyr)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="co"># Define a simple people JSON collection</span></a>
+<a class="sourceLine" id="cb1-4" data-line-number="4">people &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">'{&quot;age&quot;: 32, &quot;name&quot;: {&quot;first&quot;: &quot;Bob&quot;,   &quot;last&quot;: &quot;Smith&quot;}}'</span>,</a>
+<a class="sourceLine" id="cb1-5" data-line-number="5">            <span class="st">'{&quot;age&quot;: 54, &quot;name&quot;: {&quot;first&quot;: &quot;Susan&quot;, &quot;last&quot;: &quot;Doe&quot;}}'</span>,</a>
+<a class="sourceLine" id="cb1-6" data-line-number="6">            <span class="st">'{&quot;age&quot;: 18, &quot;name&quot;: {&quot;first&quot;: &quot;Ann&quot;,   &quot;last&quot;: &quot;Jones&quot;}}'</span>)</a>
+<a class="sourceLine" id="cb1-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb1-8" data-line-number="8"><span class="co"># Tidy the JSON data</span></a>
+<a class="sourceLine" id="cb1-9" data-line-number="9">people <span class="op">%&gt;%</span><span class="st"> </span>spread_all</a>
+<a class="sourceLine" id="cb1-10" data-line-number="10"><span class="co">#&gt; # A tbl_json: 3 x 4 tibble with a &quot;JSON&quot; attribute</span></a>
+<a class="sourceLine" id="cb1-11" data-line-number="11"><span class="co">#&gt;   `attr(., &quot;JSON&quot;)`       document.id   age name.first name.last</span></a>
+<a class="sourceLine" id="cb1-12" data-line-number="12"><span class="co">#&gt;   &lt;chr&gt;                         &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;    </span></a>
+<a class="sourceLine" id="cb1-13" data-line-number="13"><span class="co">#&gt; 1 &quot;{\&quot;age\&quot;:32,\&quot;name...&quot;           1    32 Bob        Smith    </span></a>
+<a class="sourceLine" id="cb1-14" data-line-number="14"><span class="co">#&gt; 2 &quot;{\&quot;age\&quot;:54,\&quot;name...&quot;           2    54 Susan      Doe      </span></a>
+<a class="sourceLine" id="cb1-15" data-line-number="15"><span class="co">#&gt; 3 &quot;{\&quot;age\&quot;:18,\&quot;name...&quot;           3    18 Ann        Jones</span></a></code></pre></div>
+<p>This produces a <code>tbl_json</code> object, where each row corresponds to an element of the <code>people</code> vector (a “document” in tidyjson). The JSON attribute of the <code>tbl_json</code> object is shown first, then the columns of the tibble are shown - a <code>document.id</code> indicating which document the row originated in, and then the age and name columns that <code>spread_all</code> created.</p>
 </div>
 <div id="a-more-complex-example" class="section level2">
 <h2>A more complex example</h2>
-<p>The tidyjson package really shines in a more complex example. Consider the following JSON, which describes three purchases of five items made by two individuals:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">purch_json &lt;-<span class="st"> '</span>
-<span class="st">[</span>
-<span class="st">  {</span>
-<span class="st">    &quot;name&quot;: &quot;bob&quot;, </span>
-<span class="st">    &quot;purchases&quot;: [</span>
-<span class="st">      {</span>
-<span class="st">        &quot;date&quot;: &quot;2014/09/13&quot;,</span>
-<span class="st">        &quot;items&quot;: [</span>
-<span class="st">          {&quot;name&quot;: &quot;shoes&quot;, &quot;price&quot;: 187},</span>
-<span class="st">          {&quot;name&quot;: &quot;belt&quot;, &quot;price&quot;: 35}</span>
-<span class="st">        ]</span>
-<span class="st">      }</span>
-<span class="st">    ]</span>
-<span class="st">  },</span>
-<span class="st">  {</span>
-<span class="st">    &quot;name&quot;: &quot;susan&quot;, </span>
-<span class="st">    &quot;purchases&quot;: [</span>
-<span class="st">      {</span>
-<span class="st">        &quot;date&quot;: &quot;2014/10/01&quot;,</span>
-<span class="st">        &quot;items&quot;: [</span>
-<span class="st">          {&quot;name&quot;: &quot;dress&quot;, &quot;price&quot;: 58},</span>
-<span class="st">          {&quot;name&quot;: &quot;bag&quot;, &quot;price&quot;: 118}</span>
-<span class="st">        ]</span>
-<span class="st">      },</span>
-<span class="st">      {</span>
-<span class="st">        &quot;date&quot;: &quot;2015/01/03&quot;,</span>
-<span class="st">        &quot;items&quot;: [</span>
-<span class="st">          {&quot;name&quot;: &quot;shoes&quot;, &quot;price&quot;: 115}</span>
-<span class="st">        ]</span>
-<span class="st">      }</span>
-<span class="st">    ]</span>
-<span class="st">  }</span>
-<span class="st">]'</span></code></pre></div>
-<p>Suppose we want to find out how much each person has spent. Using jsonlite, we can parse the JSON:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(jsonlite)
-<span class="co"># Parse the JSON into a data.frame</span>
-purch_df &lt;-<span class="st"> </span>jsonlite::<span class="kw">fromJSON</span>(purch_json, <span class="dt">simplifyDataFrame =</span> <span class="ot">TRUE</span>)
-<span class="co"># Examine results</span>
-purch_df
-<span class="co">#&gt;    name                                               purchases</span>
-<span class="co">#&gt; 1   bob                        2014/09/13, shoes, belt, 187, 35</span>
-<span class="co">#&gt; 2 susan 2014/10/01, 2015/01/03, dress, bag, 58, 118, shoes, 115</span></code></pre></div>
-<p>This looks deceptively simple, on inspection with <code>str()</code> we see that the resulting data structure is actually a complex nested data.frame:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(purch_df)
-<span class="co">#&gt; 'data.frame':    2 obs. of  2 variables:</span>
-<span class="co">#&gt;  $ name     : chr  &quot;bob&quot; &quot;susan&quot;</span>
-<span class="co">#&gt;  $ purchases:List of 2</span>
-<span class="co">#&gt;   ..$ :'data.frame': 1 obs. of  2 variables:</span>
-<span class="co">#&gt;   .. ..$ date : chr &quot;2014/09/13&quot;</span>
-<span class="co">#&gt;   .. ..$ items:List of 1</span>
-<span class="co">#&gt;   .. .. ..$ :'data.frame':   2 obs. of  2 variables:</span>
-<span class="co">#&gt;   .. .. .. ..$ name : chr  &quot;shoes&quot; &quot;belt&quot;</span>
-<span class="co">#&gt;   .. .. .. ..$ price: int  187 35</span>
-<span class="co">#&gt;   ..$ :'data.frame': 2 obs. of  2 variables:</span>
-<span class="co">#&gt;   .. ..$ date : chr  &quot;2014/10/01&quot; &quot;2015/01/03&quot;</span>
-<span class="co">#&gt;   .. ..$ items:List of 2</span>
-<span class="co">#&gt;   .. .. ..$ :'data.frame':   2 obs. of  2 variables:</span>
-<span class="co">#&gt;   .. .. .. ..$ name : chr  &quot;dress&quot; &quot;bag&quot;</span>
-<span class="co">#&gt;   .. .. .. ..$ price: int  58 118</span>
-<span class="co">#&gt;   .. .. ..$ :'data.frame':   1 obs. of  2 variables:</span>
-<span class="co">#&gt;   .. .. .. ..$ name : chr &quot;shoes&quot;</span>
-<span class="co">#&gt;   .. .. .. ..$ price: int 115</span></code></pre></div>
-<p>This is difficult to work with, and we end up writing code like this:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">items &lt;-<span class="st"> </span><span class="kw">lapply</span>(purch_df$purchases, <span class="st">`</span><span class="dt">[[</span><span class="st">`</span>, <span class="st">&quot;items&quot;</span>)
-prices &lt;-<span class="st"> </span><span class="kw">lapply</span>(items, lapply, <span class="st">`</span><span class="dt">[[</span><span class="st">`</span>, <span class="st">&quot;price&quot;</span>)
-<span class="kw">vapply</span>(<span class="kw">lapply</span>(prices, unlist), sum, <span class="kw">integer</span>(<span class="dv">1</span>))
-<span class="co">#&gt; [1] 222 291</span></code></pre></div>
-<p>Reasoning about code like this is nearly impossible, and further, the relational structure of the data is lost (we no longer have the name of the user).</p>
-<p>We can instead try to use dplyr and the <code>do{}</code> operator to get at the data in the nested data.frames, but this is equally challenging and confusing:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">purch_df %&gt;%<span class="st"> </span><span class="kw">group_by</span>(name) %&gt;%<span class="st"> </span><span class="kw">do</span>({
-  .$purchases[[<span class="dv">1</span>]] %&gt;%<span class="st"> </span>rowwise %&gt;%<span class="st"> </span><span class="kw">do</span>({
-    .$items[, <span class="st">&quot;price&quot;</span>, drop =<span class="st"> </span><span class="ot">FALSE</span>]
-    })
-  }) %&gt;%<span class="st"> </span><span class="kw">summarize</span>(<span class="dt">price =</span> <span class="kw">sum</span>(price))
-<span class="co">#&gt; # A tibble: 2 × 2</span>
-<span class="co">#&gt;    name price</span>
-<span class="co">#&gt;   &lt;chr&gt; &lt;int&gt;</span>
-<span class="co">#&gt; 1   bob   222</span>
-<span class="co">#&gt; 2 susan   291</span></code></pre></div>
-<p>Using tidyjson, we can build a pipeline to turn this JSON into a tidy data.frame where each row corresponds to a purchased item:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">purch_items &lt;-<span class="st"> </span>purch_json %&gt;%
-<span class="st">  </span>gather_array %&gt;%<span class="st">                                     </span><span class="co"># stack the users </span>
-<span class="st">  </span><span class="kw">spread_values</span>(<span class="dt">person =</span> <span class="kw">jstring</span>(<span class="st">&quot;name&quot;</span>)) %&gt;%<span class="st">          </span><span class="co"># extract the user name</span>
-<span class="st">  </span><span class="kw">enter_object</span>(<span class="st">&quot;purchases&quot;</span>) %&gt;%<span class="st"> </span>gather_array %&gt;%<span class="st">       </span><span class="co"># stack the purchases</span>
-<span class="st">  </span><span class="kw">spread_values</span>(<span class="dt">purchase.date =</span> <span class="kw">jstring</span>(<span class="st">&quot;date&quot;</span>)) %&gt;%<span class="st">   </span><span class="co"># extract the purchase date</span>
-<span class="st">  </span><span class="kw">enter_object</span>(<span class="st">&quot;items&quot;</span>) %&gt;%<span class="st"> </span>gather_array %&gt;%<span class="st">           </span><span class="co"># stack the items</span>
-<span class="st">  </span><span class="kw">spread_values</span>(                                       <span class="co"># extract item name and price</span>
-    <span class="dt">item.name =</span> <span class="kw">jstring</span>(<span class="st">&quot;name&quot;</span>),
-    <span class="dt">item.price =</span> <span class="kw">jnumber</span>(<span class="st">&quot;price&quot;</span>)
-  ) %&gt;%
-<span class="st">  </span><span class="kw">select</span>(person, purchase.date, item.name, item.price) <span class="co"># select only what is needed</span></code></pre></div>
-<p>The resulting data.frame is exactly what we want</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">purch_items
-<span class="co">#&gt;   person purchase.date item.name item.price</span>
-<span class="co">#&gt; 1    bob    2014/09/13     shoes        187</span>
-<span class="co">#&gt; 2    bob    2014/09/13      belt         35</span>
-<span class="co">#&gt; 3  susan    2014/10/01     dress         58</span>
-<span class="co">#&gt; 4  susan    2014/10/01       bag        118</span>
-<span class="co">#&gt; 5  susan    2015/01/03     shoes        115</span></code></pre></div>
-<p>And we can easily continue the pipeline in dplyr to compute derived data</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">purch_items %&gt;%<span class="st"> </span><span class="kw">group_by</span>(person) %&gt;%<span class="st"> </span><span class="kw">summarize</span>(<span class="dt">spend =</span> <span class="kw">sum</span>(item.price))
-<span class="co">#&gt; # A tibble: 2 × 2</span>
-<span class="co">#&gt;   person spend</span>
-<span class="co">#&gt;    &lt;chr&gt; &lt;dbl&gt;</span>
-<span class="co">#&gt; 1    bob   222</span>
-<span class="co">#&gt; 2  susan   291</span></code></pre></div>
+<p>The tidyjson package really shines in a more complex example. Consider the <code>worldbank</code> data included in the tidyjson package.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">worldbank <span class="op">%&gt;%</span><span class="st"> </span>str</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="co">#&gt;  chr [1:500] &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:\&quot;52b213b38594d8a2be17c780\&quot;},\&quot;boardapprovaldate\&quot;:\&quot;2013-11-12T00:00:00Z\&quot;,\&quot;closingdate\&quot;&quot;| __truncated__ ...</span></a></code></pre></div>
+<p>It is a 500 length character vector of projects funded by the world bank. We can quickly expand all simple columns using <code>spread_all</code></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">worldbank <span class="op">%&gt;%</span><span class="st"> </span>spread_all</a>
+<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="co">#&gt; # A tbl_json: 500 x 8 tibble with a &quot;JSON&quot; attribute</span></a>
+<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co">#&gt;   `attr(., &quot;JSON&quot;… document.id boardapprovalda… closingdate</span></a>
+<a class="sourceLine" id="cb3-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt;                  &lt;int&gt; &lt;chr&gt;            &lt;chr&gt;      </span></a>
+<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="co">#&gt; 1 &quot;{\&quot;_id\&quot;:{\&quot;$o…           1 2013-11-12T00:0… 2018-07-07…</span></a>
+<a class="sourceLine" id="cb3-6" data-line-number="6"><span class="co">#&gt; 2 &quot;{\&quot;_id\&quot;:{\&quot;$o…           2 2013-11-04T00:0… &lt;NA&gt;       </span></a>
+<a class="sourceLine" id="cb3-7" data-line-number="7"><span class="co">#&gt; 3 &quot;{\&quot;_id\&quot;:{\&quot;$o…           3 2013-11-01T00:0… &lt;NA&gt;       </span></a>
+<a class="sourceLine" id="cb3-8" data-line-number="8"><span class="co">#&gt; 4 &quot;{\&quot;_id\&quot;:{\&quot;$o…           4 2013-10-31T00:0… &lt;NA&gt;       </span></a>
+<a class="sourceLine" id="cb3-9" data-line-number="9"><span class="co">#&gt; # … with 496 more rows, and 5 more variables: countryshortname &lt;chr&gt;,</span></a>
+<a class="sourceLine" id="cb3-10" data-line-number="10"><span class="co">#&gt; #   project_name &lt;chr&gt;, regionname &lt;chr&gt;, totalamt &lt;dbl&gt;, `_id.$oid` &lt;chr&gt;</span></a></code></pre></div>
+<p>And we can limit the coluns produced by calling <code>dplyr::select</code> after</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">worldbank <span class="op">%&gt;%</span><span class="st"> </span>spread_all <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(regionname, totalamt)</a>
+<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="co">#&gt; # A tbl_json: 500 x 2 tibble with a &quot;JSON&quot; attribute</span></a>
+<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#&gt;   `attr(., &quot;JSON&quot;)`        regionname                    totalamt</span></a>
+<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt;                    &lt;chr&gt;                            &lt;dbl&gt;</span></a>
+<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co">#&gt; 1 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot; Africa                       130000000</span></a>
+<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt; 2 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot; Middle East and North Africa         0</span></a>
+<a class="sourceLine" id="cb4-7" data-line-number="7"><span class="co">#&gt; 3 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot; East Asia and Pacific          6060000</span></a>
+<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="co">#&gt; 4 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot; Middle East and North Africa         0</span></a>
+<a class="sourceLine" id="cb4-9" data-line-number="9"><span class="co">#&gt; # … with 496 more rows</span></a></code></pre></div>
+<p>But worldbank also contains arrays, which cannot be naively spread into new columns. We can use <code>gather_object</code> to gather all name-value paris by name, and then <code>json_types</code> to identify the type of JSON stored under each value, and <code>dplyr::count</code> to aggregate across documents:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">worldbank <span class="op">%&gt;%</span><span class="st"> </span>gather_object <span class="op">%&gt;%</span><span class="st"> </span>json_types <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">count</span>(name, type)</a>
+<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="co">#&gt; # A tibble: 8 x 3</span></a>
+<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="co">#&gt;   name                type       n</span></a>
+<a class="sourceLine" id="cb5-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt;               &lt;fct&gt;  &lt;int&gt;</span></a>
+<a class="sourceLine" id="cb5-5" data-line-number="5"><span class="co">#&gt; 1 _id                 object   500</span></a>
+<a class="sourceLine" id="cb5-6" data-line-number="6"><span class="co">#&gt; 2 boardapprovaldate   string   500</span></a>
+<a class="sourceLine" id="cb5-7" data-line-number="7"><span class="co">#&gt; 3 closingdate         string   370</span></a>
+<a class="sourceLine" id="cb5-8" data-line-number="8"><span class="co">#&gt; 4 countryshortname    string   500</span></a>
+<a class="sourceLine" id="cb5-9" data-line-number="9"><span class="co">#&gt; 5 majorsector_percent array    500</span></a>
+<a class="sourceLine" id="cb5-10" data-line-number="10"><span class="co">#&gt; 6 project_name        string   500</span></a>
+<a class="sourceLine" id="cb5-11" data-line-number="11"><span class="co">#&gt; 7 regionname          string   500</span></a>
+<a class="sourceLine" id="cb5-12" data-line-number="12"><span class="co">#&gt; 8 totalamt            number   500</span></a></code></pre></div>
+<p>It appears that <code>majorsector_percent</code> is an array, and so we can use <code>enter_object</code> to enter into it:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">worldbank <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">enter_object</span>(majorsector_percent)</a>
+<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="co">#&gt; # A tbl_json: 500 x 1 tibble with a &quot;JSON&quot; attribute</span></a>
+<a class="sourceLine" id="cb6-3" data-line-number="3"><span class="co">#&gt;   `attr(., &quot;JSON&quot;)`       document.id</span></a>
+<a class="sourceLine" id="cb6-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt;                         &lt;int&gt;</span></a>
+<a class="sourceLine" id="cb6-5" data-line-number="5"><span class="co">#&gt; 1 &quot;[{\&quot;Name\&quot;:\&quot;Educa...&quot;           1</span></a>
+<a class="sourceLine" id="cb6-6" data-line-number="6"><span class="co">#&gt; 2 &quot;[{\&quot;Name\&quot;:\&quot;Publi...&quot;           2</span></a>
+<a class="sourceLine" id="cb6-7" data-line-number="7"><span class="co">#&gt; 3 &quot;[{\&quot;Name\&quot;:\&quot;Trans...&quot;           3</span></a>
+<a class="sourceLine" id="cb6-8" data-line-number="8"><span class="co">#&gt; 4 &quot;[{\&quot;Name\&quot;:\&quot;Healt...&quot;           4</span></a>
+<a class="sourceLine" id="cb6-9" data-line-number="9"><span class="co">#&gt; # … with 496 more rows</span></a></code></pre></div>
+<p>and <code>gather_array</code> to gather it by index</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">worldbank <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">enter_object</span>(majorsector_percent) <span class="op">%&gt;%</span><span class="st"> </span>gather_array</a>
+<a class="sourceLine" id="cb7-2" data-line-number="2"><span class="co">#&gt; # A tbl_json: 1,405 x 2 tibble with a &quot;JSON&quot; attribute</span></a>
+<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="co">#&gt;   `attr(., &quot;JSON&quot;)`       document.id array.index</span></a>
+<a class="sourceLine" id="cb7-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt;                         &lt;int&gt;       &lt;int&gt;</span></a>
+<a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co">#&gt; 1 &quot;{\&quot;Name\&quot;:\&quot;Educat...&quot;           1           1</span></a>
+<a class="sourceLine" id="cb7-6" data-line-number="6"><span class="co">#&gt; 2 &quot;{\&quot;Name\&quot;:\&quot;Educat...&quot;           1           2</span></a>
+<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="co">#&gt; 3 &quot;{\&quot;Name\&quot;:\&quot;Public...&quot;           1           3</span></a>
+<a class="sourceLine" id="cb7-8" data-line-number="8"><span class="co">#&gt; 4 &quot;{\&quot;Name\&quot;:\&quot;Educat...&quot;           1           4</span></a>
+<a class="sourceLine" id="cb7-9" data-line-number="9"><span class="co">#&gt; # … with 1,401 more rows</span></a></code></pre></div>
+<p>We can then <code>spread_all</code> again to capture the name-value pairs stored in each object</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">worldbank <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb8-2" data-line-number="2"><span class="st">  </span><span class="kw">enter_object</span>(majorsector_percent) <span class="op">%&gt;%</span><span class="st"> </span>gather_array <span class="op">%&gt;%</span><span class="st"> </span>spread_all</a>
+<a class="sourceLine" id="cb8-3" data-line-number="3"><span class="co">#&gt; # A tbl_json: 1,405 x 4 tibble with a &quot;JSON&quot; attribute</span></a>
+<a class="sourceLine" id="cb8-4" data-line-number="4"><span class="co">#&gt;   `attr(., &quot;JSON&quot;)`    document.id array.index Name                 Percent</span></a>
+<a class="sourceLine" id="cb8-5" data-line-number="5"><span class="co">#&gt;   &lt;chr&gt;                      &lt;int&gt;       &lt;int&gt; &lt;chr&gt;                  &lt;dbl&gt;</span></a>
+<a class="sourceLine" id="cb8-6" data-line-number="6"><span class="co">#&gt; 1 &quot;{\&quot;Name\&quot;:\&quot;Educat…           1           1 Education                 46</span></a>
+<a class="sourceLine" id="cb8-7" data-line-number="7"><span class="co">#&gt; 2 &quot;{\&quot;Name\&quot;:\&quot;Educat…           1           2 Education                 26</span></a>
+<a class="sourceLine" id="cb8-8" data-line-number="8"><span class="co">#&gt; 3 &quot;{\&quot;Name\&quot;:\&quot;Public…           1           3 Public Administrati…      16</span></a>
+<a class="sourceLine" id="cb8-9" data-line-number="9"><span class="co">#&gt; 4 &quot;{\&quot;Name\&quot;:\&quot;Educat…           1           4 Education                 12</span></a>
+<a class="sourceLine" id="cb8-10" data-line-number="10"><span class="co">#&gt; # … with 1,401 more rows</span></a></code></pre></div>
+<p>By combining with our initial top-level <code>spread_all</code>, we can aggregate funding dollars by sector by region:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">worldbank <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb9-2" data-line-number="2"><span class="st">  </span>spread_all <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="dt">region =</span> regionname, <span class="dt">funding =</span> totalamt) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb9-3" data-line-number="3"><span class="st">  </span><span class="kw">enter_object</span>(majorsector_percent) <span class="op">%&gt;%</span><span class="st"> </span>gather_array <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb9-4" data-line-number="4"><span class="st">  </span>spread_all <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">rename</span>(<span class="dt">sector =</span> Name, <span class="dt">percent =</span> Percent) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb9-5" data-line-number="5"><span class="st">  </span><span class="kw">group_by</span>(region, sector) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb9-6" data-line-number="6"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">funding =</span> <span class="kw">sum</span>(funding <span class="op">*</span><span class="st"> </span>percent))</a>
+<a class="sourceLine" id="cb9-7" data-line-number="7"><span class="co">#&gt; # A tibble: 63 x 3</span></a>
+<a class="sourceLine" id="cb9-8" data-line-number="8"><span class="co">#&gt; # Groups:   region [7]</span></a>
+<a class="sourceLine" id="cb9-9" data-line-number="9"><span class="co">#&gt;   region sector                                 funding</span></a>
+<a class="sourceLine" id="cb9-10" data-line-number="10"><span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;                                    &lt;dbl&gt;</span></a>
+<a class="sourceLine" id="cb9-11" data-line-number="11"><span class="co">#&gt; 1 Africa Agriculture, fishing, and forestry 96648500000</span></a>
+<a class="sourceLine" id="cb9-12" data-line-number="12"><span class="co">#&gt; 2 Africa Education                          83370000000</span></a>
+<a class="sourceLine" id="cb9-13" data-line-number="13"><span class="co">#&gt; 3 Africa Energy and mining                  86709960000</span></a>
+<a class="sourceLine" id="cb9-14" data-line-number="14"><span class="co">#&gt; 4 Africa Finance                            30761000000</span></a>
+<a class="sourceLine" id="cb9-15" data-line-number="15"><span class="co">#&gt; # … with 59 more rows</span></a></code></pre></div>
 </div>
-<div id="data" class="section level2">
-<h2>Data</h2>
-<div id="creating-a-tbl_json-object" class="section level3">
-<h3>Creating a <code>tbl_json</code> object</h3>
-<p>The first step in using tidyjson is to convert your JSON into a <code>tbl_json</code> object. Almost every function in tidyjson accepts either a <code>tbl_json</code> object or a character vector of JSON data as it’s first parameter, and returns a <code>tbl_json</code> object for downstream use. To facilitate integration with dplyr, <code>tbl_json</code> inherits from <code>dplyr::tbl</code>.</p>
-<p>The easiest way to construct a <code>tbl_json</code> object is directly from a character string:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Using a single character string</span>
-x &lt;-<span class="st"> '{&quot;key&quot;: &quot;value&quot;}'</span> %&gt;%<span class="st"> </span>as.tbl_json
-x
-<span class="co">#&gt;   document.id</span>
-<span class="co">#&gt; 1           1</span>
-<span class="kw">attr</span>(x, <span class="st">&quot;JSON&quot;</span>)
-<span class="co">#&gt; [[1]]</span>
-<span class="co">#&gt; [[1]]$key</span>
-<span class="co">#&gt; [1] &quot;value&quot;</span></code></pre></div>
-<p>Behind the scenes, <code>as.tbl_json</code> is parsing the JSON string and creating a data.frame with 1 column, <code>document.id</code>, which keeps track of the character vector position (index) where the JSON data came from. In addition, each <code>tbl_json</code> object has a “JSON” attribute that contains a list of JSON data of the same length as the number of rows in the <code>data.frame</code>.</p>
-<p>Often times you will have many lines of JSON data that you want to work with, in which case you can directly convert a character vector to obtain a <code>tbl_json</code> object with the same number of rows:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Using a vector of JSON strings</span>
-y &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">'{&quot;key1&quot;: &quot;value1&quot;}'</span>, <span class="st">'{&quot;key2&quot;: &quot;value2&quot;}'</span>) %&gt;%<span class="st"> </span>as.tbl_json
-y
-<span class="co">#&gt;   document.id</span>
-<span class="co">#&gt; 1           1</span>
-<span class="co">#&gt; 2           2</span></code></pre></div>
-<p>This creates a two row <code>tbl_json</code> object, where each row corresponds to an index of the character vector. We can see the underlying parsed JSON:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">attr</span>(y, <span class="st">&quot;JSON&quot;</span>)
-<span class="co">#&gt; [[1]]</span>
-<span class="co">#&gt; [[1]]$key1</span>
-<span class="co">#&gt; [1] &quot;value1&quot;</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [[2]]</span>
-<span class="co">#&gt; [[2]]$key2</span>
-<span class="co">#&gt; [1] &quot;value2&quot;</span></code></pre></div>
-<p>If your JSON data is already embedded in a data.frame, then you will need to call <code>as.tbl_json</code> directly in order to specific which column contains the JSON data. Note that the JSON in the data.frame should be character data, and not a factor. Use <code>stringsAsFactors = FALSE</code> in constructing the data.frame to avoid turning the JSON into a factor.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(
-  <span class="dt">x =</span> <span class="dv">1</span>:<span class="dv">2</span>,
-  <span class="dt">JSON =</span> <span class="kw">c</span>(<span class="st">'{&quot;key1&quot;: &quot;value1&quot;}'</span>, <span class="st">'{&quot;key2&quot;: &quot;value2&quot;}'</span>),
-  <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>
-) 
-z &lt;-<span class="st"> </span>df %&gt;%<span class="st"> </span><span class="kw">as.tbl_json</span>(<span class="dt">json.column =</span> <span class="st">&quot;JSON&quot;</span>)
-z
-<span class="co">#&gt;   x</span>
-<span class="co">#&gt; 1 1</span>
-<span class="co">#&gt; 2 2</span>
-<span class="kw">attr</span>(z, <span class="st">&quot;JSON&quot;</span>)
-<span class="co">#&gt; [[1]]</span>
-<span class="co">#&gt; [[1]]$key1</span>
-<span class="co">#&gt; [1] &quot;value1&quot;</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [[2]]</span>
-<span class="co">#&gt; [[2]]$key2</span>
-<span class="co">#&gt; [1] &quot;value2&quot;</span></code></pre></div>
-</div>
-<div id="json-included-in-the-package" class="section level3">
-<h3>JSON included in the package</h3>
-<p>The tidyjson package comes with several JSON example datasets:</p>
-<ul>
-<li><code>commits</code>: commit data for the dplyr repo from github API</li>
-<li><code>issues</code>: issue data for the dplyr repo from github API</li>
-<li><code>worldbank</code>: world bank funded projects from <a href="http://jsonstudio.com/resources/">jsonstudio</a></li>
-<li><code>companies</code>: startup company data from <a href="http://jsonstudio.com/resources/">jsonstudio</a></li>
-</ul>
-<p>Each dataset has some example tidyjson queries in <code>help(commits)</code>, <code>help(issues)</code>, <code>help(worldbank)</code> and <code>help(companies)</code>.</p>
-</div>
-</div>
-<div id="verbs" class="section level2">
-<h2>Verbs</h2>
-<p>The rest of tidyjson is comprised of various verbs with operate on <code>tbl_json</code> objects and return <code>tbl_json</code> objects. They are meant to be used in a pipeline with the <code>%&gt;%</code> operator.</p>
-<p>Note that these verbs all operate on <em>both</em> the underlying data.frame and the JSON, iteratively moving data from the JSON into the data.frame. Any modifications of the underlying data.frame outside of these operations may produce unintended consequences where the data.frame and JSON become out of synch.</p>
-<p>The following table provides a reference of how each verb is used and what (if any) effect it has on the data.frame rows and columns and on the associated JSON.</p>
+<div id="tidyjson-functions" class="section level2">
+<h2>Tidyjson functions</h2>
+<p>Tidyjson provides the following core functions:</p>
 <table>
-<colgroup>
-<col width="19%"></col>
-<col width="29%"></col>
-<col width="19%"></col>
-<col width="17%"></col>
-<col width="13%"></col>
-</colgroup>
 <thead>
 <tr class="header">
-<th align="left">Verb</th>
+<th align="left">Function</th>
 <th align="left">Use</th>
 <th align="left">Row Effect</th>
 <th align="left">Column Effect</th>
@@ -333,333 +451,233 @@ z
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left"><code>json_types()</code></td>
-<td align="left">Identify JSON structure</td>
-<td align="left">none</td>
-<td align="left">type column</td>
-<td align="left">none</td>
+<td align="left"><code>spread_all</code></td>
+<td align="left">Spread all object values</td>
+<td align="left"></td>
+<td align="left">add many columns</td>
+<td align="left"></td>
 </tr>
 <tr class="even">
-<td align="left"><code>gather_array()</code></td>
-<td align="left">Stack JSON array</td>
-<td align="left">Repeats rows</td>
+<td align="left"><code>spread_values</code></td>
+<td align="left">Spread specific columns</td>
+<td align="left"></td>
+<td align="left">specific columns</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left"><code>gather_array</code></td>
+<td align="left">Gather a JSON array</td>
+<td align="left">Duplicates rows</td>
 <td align="left">index column</td>
 <td align="left">enter array</td>
 </tr>
-<tr class="odd">
-<td align="left"><code>gather_keys()</code></td>
-<td align="left">Stack a {“key”: value} object</td>
-<td align="left">Repeats rows</td>
-<td align="left">key column</td>
+<tr class="even">
+<td align="left"><code>gather_object</code></td>
+<td align="left">Gather a JSON object</td>
+<td align="left">Duplicates rows</td>
+<td align="left">name column</td>
 <td align="left">enter object</td>
 </tr>
-<tr class="even">
-<td align="left"><code>spread_values()</code></td>
-<td align="left">Create new columns from values</td>
-<td align="left">none</td>
-<td align="left">N value columns</td>
-<td align="left">none</td>
-</tr>
 <tr class="odd">
-<td align="left"><code>append_values_X()</code></td>
+<td align="left"><code>append_values_X</code></td>
 <td align="left">Append all values of a type</td>
-<td align="left">none</td>
+<td align="left"></td>
 <td align="left">column of type X</td>
-<td align="left">none</td>
+<td align="left"></td>
 </tr>
 <tr class="even">
-<td align="left"><code>enter_object()</code></td>
-<td align="left">Dive into an object “key”</td>
-<td align="left">Keeps rows with key</td>
-<td align="left">none</td>
+<td align="left"><code>enter_object</code></td>
+<td align="left">Enter into an object by name</td>
+<td align="left">Keeps rows with name</td>
+<td align="left"></td>
 <td align="left">enter object</td>
 </tr>
 <tr class="odd">
-<td align="left"><code>json_lengths()</code></td>
+<td align="left"><code>json_types</code></td>
+<td align="left">Identify JSON type</td>
+<td align="left"></td>
+<td align="left">type column</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left"><code>json_lengths</code></td>
 <td align="left">Identify JSON length</td>
-<td align="left">none</td>
+<td align="left"></td>
 <td align="left">length column</td>
-<td align="left">none</td>
+<td align="left"></td>
 </tr>
 </tbody>
 </table>
-<div id="identify-json-structure-with-json_types" class="section level3">
-<h3>Identify JSON structure with <code>json_types()</code></h3>
-<p>One of the first steps you will want to take is to investigate the structure of your JSON data. The function <code>json_types()</code> inspects the JSON associated with each row of the data.frame, and adds a new column (<code>type</code> by default) that identifies the type according to the <a href="http://json.org/">JSON standard</a>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">c</span>(<span class="st">'{&quot;a&quot;: 1}'</span>, <span class="st">'[1, 2]'</span>, <span class="st">'&quot;a&quot;'</span>, <span class="st">'1'</span>, <span class="st">'true'</span>, <span class="st">'null'</span>) %&gt;%<span class="st"> </span>json_types
-<span class="co">#&gt;   document.id    type</span>
-<span class="co">#&gt; 1           1  object</span>
-<span class="co">#&gt; 2           2   array</span>
-<span class="co">#&gt; 3           3  string</span>
-<span class="co">#&gt; 4           4  number</span>
-<span class="co">#&gt; 5           5 logical</span>
-<span class="co">#&gt; 6           6    null</span></code></pre></div>
-<p>This is particularly useful for inspecting your JSON data types, and can added after <code>gather_array()</code> (or <code>gather_keys()</code>) to inspect the types of the elements (or values) in arrays (or objects).</p>
+<p>These functions can be composed into pipelines using the <code>%&gt;%</code> operator, as each takes a <code>tbl_json</code> object and returns a <code>tbl_json</code> object.</p>
 </div>
-<div id="stack-a-json-array-with-gather_array" class="section level3">
-<h3>Stack a JSON array with <code>gather_array()</code></h3>
-<p>Arrays are sometimes vectors (fixed or varying length integer, character or logical vectors). But they also often contain lists of other objects (like a list of purchases for a user). The function <code>gather_array()</code> takes JSON arrays and duplicates the rows in the data.frame to correspond to the indices of the array, and puts the elements of the array into the JSON attribute. This is equivalent to “stacking” the array in the data.frame, and lets you continue to manipulate the remaining JSON in the elements of the array.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">'[1, &quot;a&quot;, {&quot;k&quot;: &quot;v&quot;}]'</span> %&gt;%<span class="st"> </span>gather_array %&gt;%<span class="st"> </span>json_types
-<span class="co">#&gt;   document.id array.index   type</span>
-<span class="co">#&gt; 1           1           1 number</span>
-<span class="co">#&gt; 2           1           2 string</span>
-<span class="co">#&gt; 3           1           3 object</span></code></pre></div>
-<p>This allows you to <em>enter into</em> an array and begin processing it’s elements with other tidyjson functions. It retains the array.index in case the relative position of elements in the array is useful information.</p>
+<div id="common-patterns" class="section level2">
+<h2>Common patterns</h2>
+<p>The following are common patterns for manipulating JSON data with tidyjson.</p>
+<div id="spread-selected" class="section level3">
+<h3>Spread selected</h3>
+<p>Spread all object values and select a subset to continue working with.</p>
+<p><code>spread_all %&gt;% select</code></p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">worldbank <span class="op">%&gt;%</span><span class="st"> </span>spread_all <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(regionname, totalamt)</a>
+<a class="sourceLine" id="cb10-2" data-line-number="2"><span class="co">#&gt; # A tbl_json: 500 x 2 tibble with a &quot;JSON&quot; attribute</span></a>
+<a class="sourceLine" id="cb10-3" data-line-number="3"><span class="co">#&gt;   `attr(., &quot;JSON&quot;)`        regionname                    totalamt</span></a>
+<a class="sourceLine" id="cb10-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt;                    &lt;chr&gt;                            &lt;dbl&gt;</span></a>
+<a class="sourceLine" id="cb10-5" data-line-number="5"><span class="co">#&gt; 1 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot; Africa                       130000000</span></a>
+<a class="sourceLine" id="cb10-6" data-line-number="6"><span class="co">#&gt; 2 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot; Middle East and North Africa         0</span></a>
+<a class="sourceLine" id="cb10-7" data-line-number="7"><span class="co">#&gt; 3 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot; East Asia and Pacific          6060000</span></a>
+<a class="sourceLine" id="cb10-8" data-line-number="8"><span class="co">#&gt; 4 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot; Middle East and North Africa         0</span></a>
+<a class="sourceLine" id="cb10-9" data-line-number="9"><span class="co">#&gt; # … with 496 more rows</span></a></code></pre></div>
 </div>
-<div id="stack-a-key-value-object-with-gather_keys" class="section level3">
-<h3>Stack a {“key”: value} object with <code>gather_keys()</code></h3>
-<p>Similar to <code>gather_array()</code>, <code>gather_keys()</code> takes JSON objects and duplicates the rows in the data.frame to correspond to the keys of the object, and puts the values of the object into the JSON attribute.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">'{&quot;name&quot;: &quot;bob&quot;, &quot;age&quot;: 32}'</span> %&gt;%<span class="st"> </span>gather_keys %&gt;%<span class="st"> </span>json_types
-<span class="co">#&gt;   document.id  key   type</span>
-<span class="co">#&gt; 1           1 name string</span>
-<span class="co">#&gt; 2           1  age number</span></code></pre></div>
-<p>This allows you to <em>enter into</em> the keys of the objects just like <code>gather_array</code> let you enter elements of the array.</p>
+<div id="object-structure" class="section level3">
+<h3>Object structure</h3>
+<p>Identify the names under an object, and their type and frequency.</p>
+<p><code>gather_object %&gt;% json_types %&gt;% count(name, type)</code></p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">worldbank <span class="op">%&gt;%</span><span class="st"> </span>gather_object <span class="op">%&gt;%</span><span class="st"> </span>json_types <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">count</span>(name, type)</a>
+<a class="sourceLine" id="cb11-2" data-line-number="2"><span class="co">#&gt; # A tibble: 8 x 3</span></a>
+<a class="sourceLine" id="cb11-3" data-line-number="3"><span class="co">#&gt;   name              type       n</span></a>
+<a class="sourceLine" id="cb11-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt;             &lt;fct&gt;  &lt;int&gt;</span></a>
+<a class="sourceLine" id="cb11-5" data-line-number="5"><span class="co">#&gt; 1 _id               object   500</span></a>
+<a class="sourceLine" id="cb11-6" data-line-number="6"><span class="co">#&gt; 2 boardapprovaldate string   500</span></a>
+<a class="sourceLine" id="cb11-7" data-line-number="7"><span class="co">#&gt; 3 closingdate       string   370</span></a>
+<a class="sourceLine" id="cb11-8" data-line-number="8"><span class="co">#&gt; 4 countryshortname  string   500</span></a>
+<a class="sourceLine" id="cb11-9" data-line-number="9"><span class="co">#&gt; # … with 4 more rows</span></a></code></pre></div>
 </div>
-<div id="create-new-columns-with-json-values-with-spread_values" class="section level3">
-<h3>Create new columns with JSON values with <code>spread_values()</code></h3>
-<p>Adding new columns to your <code>data.frame</code> is accomplished with <code>spread_values()</code>, which lets you dive into (potentially nested) JSON objects and extract specific values. <code>spread_values()</code> takes <code>jstring()</code>, <code>jnumber()</code> or <code>jlogical()</code> function calls as arguments in order to specify the type of the data that should be captured at each desired key location</p>
-<p>These values can be of varying types at varying depths, e.g.,</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">'{&quot;name&quot;: {&quot;first&quot;: &quot;bob&quot;, &quot;last&quot;: &quot;jones&quot;}, &quot;age&quot;: 32}'</span> %&gt;%
-<span class="st">  </span><span class="kw">spread_values</span>(
-    <span class="dt">first.name =</span> <span class="kw">jstring</span>(<span class="st">&quot;name&quot;</span>, <span class="st">&quot;first&quot;</span>), 
-    <span class="dt">age =</span> <span class="kw">jnumber</span>(<span class="st">&quot;age&quot;</span>)
-  )
-<span class="co">#&gt;   document.id first.name age</span>
-<span class="co">#&gt; 1           1        bob  32</span></code></pre></div>
+<div id="gather-nested-array" class="section level3">
+<h3>Gather nested array</h3>
+<p>Enter into an array nested under an object, and gather it</p>
+<p><code>enter_object %&gt;% gather_array</code></p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">worldbank <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">enter_object</span>(majorsector_percent) <span class="op">%&gt;%</span><span class="st"> </span>gather_array</a>
+<a class="sourceLine" id="cb12-2" data-line-number="2"><span class="co">#&gt; # A tbl_json: 1,405 x 2 tibble with a &quot;JSON&quot; attribute</span></a>
+<a class="sourceLine" id="cb12-3" data-line-number="3"><span class="co">#&gt;   `attr(., &quot;JSON&quot;)`       document.id array.index</span></a>
+<a class="sourceLine" id="cb12-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt;                         &lt;int&gt;       &lt;int&gt;</span></a>
+<a class="sourceLine" id="cb12-5" data-line-number="5"><span class="co">#&gt; 1 &quot;{\&quot;Name\&quot;:\&quot;Educat...&quot;           1           1</span></a>
+<a class="sourceLine" id="cb12-6" data-line-number="6"><span class="co">#&gt; 2 &quot;{\&quot;Name\&quot;:\&quot;Educat...&quot;           1           2</span></a>
+<a class="sourceLine" id="cb12-7" data-line-number="7"><span class="co">#&gt; 3 &quot;{\&quot;Name\&quot;:\&quot;Public...&quot;           1           3</span></a>
+<a class="sourceLine" id="cb12-8" data-line-number="8"><span class="co">#&gt; 4 &quot;{\&quot;Name\&quot;:\&quot;Educat...&quot;           1           4</span></a>
+<a class="sourceLine" id="cb12-9" data-line-number="9"><span class="co">#&gt; # … with 1,401 more rows</span></a></code></pre></div>
 </div>
-<div id="append-all-values-of-a-specified-type-with-append_values_x" class="section level3">
-<h3>Append all values of a specified type with <code>append_values_X()</code></h3>
-<p>The <code>append_values_X()</code> functions let you take the remaining JSON and add it as a column X (for X in “string”, “number”, “logical”) insofar as it is of the JSON type specified. For example:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">'{&quot;first&quot;: &quot;bob&quot;, &quot;last&quot;: &quot;jones&quot;}'</span> %&gt;%<span class="st"> </span>
-<span class="st">  </span><span class="kw">gather_keys</span>() %&gt;%
-<span class="st">  </span><span class="kw">append_values_string</span>()
-<span class="co">#&gt;   document.id   key string</span>
-<span class="co">#&gt; 1           1 first    bob</span>
-<span class="co">#&gt; 2           1  last  jones</span></code></pre></div>
-<p>Any values that do not conform to the type specified will be NA in the resulting column. This includes other scalar types (e.g., numbers or logicals if you are using <code>append_values_string()</code>) and <em>also</em> any rows where the JSON is still an object or an array.</p>
+<div id="filter-for-a-specific-type" class="section level3">
+<h3>Filter for a specific type</h3>
+<p>Filter to just objects / arrays and then gather them</p>
+<p><code>filter(is_json_X(.)) %&gt;% gather_X</code></p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1">companies[<span class="dv">1</span>] <span class="op">%&gt;%</span><span class="st"> </span>gather_object <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb13-2" data-line-number="2"><span class="st">  </span><span class="kw">filter</span>(<span class="kw">is_json_array</span>(.)) <span class="op">%&gt;%</span><span class="st"> </span>gather_array</a>
+<a class="sourceLine" id="cb13-3" data-line-number="3"><span class="co">#&gt; # A tbl_json: 8 x 3 tibble with a &quot;JSON&quot; attribute</span></a>
+<a class="sourceLine" id="cb13-4" data-line-number="4"><span class="co">#&gt;   `attr(., &quot;JSON&quot;)`       document.id name           array.index</span></a>
+<a class="sourceLine" id="cb13-5" data-line-number="5"><span class="co">#&gt;   &lt;chr&gt;                         &lt;int&gt; &lt;chr&gt;                &lt;int&gt;</span></a>
+<a class="sourceLine" id="cb13-6" data-line-number="6"><span class="co">#&gt; 1 &quot;{\&quot;is_past\&quot;:fals...&quot;            1 relationships            1</span></a>
+<a class="sourceLine" id="cb13-7" data-line-number="7"><span class="co">#&gt; 2 &quot;{\&quot;id\&quot;:6252,\&quot;rou...&quot;           1 funding_rounds           1</span></a>
+<a class="sourceLine" id="cb13-8" data-line-number="8"><span class="co">#&gt; 3 &quot;{\&quot;id\&quot;:15229,\&quot;ro...&quot;           1 funding_rounds           2</span></a>
+<a class="sourceLine" id="cb13-9" data-line-number="9"><span class="co">#&gt; 4 &quot;{\&quot;id\&quot;:22565,\&quot;ro...&quot;           1 funding_rounds           3</span></a>
+<a class="sourceLine" id="cb13-10" data-line-number="10"><span class="co">#&gt; # … with 4 more rows</span></a></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">companies[<span class="dv">1</span>] <span class="op">%&gt;%</span><span class="st"> </span>gather_object <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb14-2" data-line-number="2"><span class="st">  </span><span class="kw">filter</span>(<span class="kw">is_json_object</span>(.)) <span class="op">%&gt;%</span><span class="st"> </span>gather_object</a>
+<a class="sourceLine" id="cb14-3" data-line-number="3"><span class="co">#&gt; Warning in gather_object(.): name column name already exists, changing to</span></a>
+<a class="sourceLine" id="cb14-4" data-line-number="4"><span class="co">#&gt; name.2</span></a>
+<a class="sourceLine" id="cb14-5" data-line-number="5"><span class="co">#&gt; # A tbl_json: 3 x 3 tibble with a &quot;JSON&quot; attribute</span></a>
+<a class="sourceLine" id="cb14-6" data-line-number="6"><span class="co">#&gt;   `attr(., &quot;JSON&quot;)`     document.id name  name.2         </span></a>
+<a class="sourceLine" id="cb14-7" data-line-number="7"><span class="co">#&gt;   &lt;chr&gt;                       &lt;int&gt; &lt;chr&gt; &lt;chr&gt;          </span></a>
+<a class="sourceLine" id="cb14-8" data-line-number="8"><span class="co">#&gt; 1 &quot;\&quot;52cdef7e4bab8b...&quot;           1 _id   $oid           </span></a>
+<a class="sourceLine" id="cb14-9" data-line-number="9"><span class="co">#&gt; 2 &quot;[[[150,22],\&quot;ass...&quot;           1 image available_sizes</span></a>
+<a class="sourceLine" id="cb14-10" data-line-number="10"><span class="co">#&gt; 3 null                            1 image attribution</span></a></code></pre></div>
 </div>
-<div id="dive-into-a-specific-object-key-with-enter_object" class="section level3">
-<h3>Dive into a specific object “key” with <code>enter_object()</code></h3>
-<p>For complex JSON structures, you will often need to navigate into nested objects in order to continue structuring your data. The function <code>enter_object()</code> lets you dive into a specific object key in the JSON attribute, so that all further tidyjson calls happen inside that object (all other JSON data outside the object is discarded). If the object doesn’t exist for a given row / index, then that data.frame row will be discarded.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">c</span>(<span class="st">'{&quot;name&quot;: &quot;bob&quot;, &quot;children&quot;: [&quot;sally&quot;, &quot;george&quot;]}'</span>, <span class="st">'{&quot;name&quot;: &quot;anne&quot;}'</span>) %&gt;%<span class="st"> </span>
-<span class="st">  </span><span class="kw">spread_values</span>(<span class="dt">parent.name =</span> <span class="kw">jstring</span>(<span class="st">&quot;name&quot;</span>)) %&gt;%
-<span class="st">  </span><span class="kw">enter_object</span>(<span class="st">&quot;children&quot;</span>) %&gt;%<span class="st"> </span>
-<span class="st">  </span>gather_array %&gt;%<span class="st"> </span>
-<span class="st">  </span><span class="kw">append_values_string</span>(<span class="st">&quot;children&quot;</span>)
-<span class="co">#&gt;   document.id parent.name array.index children</span>
-<span class="co">#&gt; 1           1         bob           1    sally</span>
-<span class="co">#&gt; 2           1         bob           2   george</span></code></pre></div>
-<p>This is useful when you want to limit your data to just information found in a specific key.</p>
-</div>
-<div id="identify-length-of-json-objects-with-json_lengths" class="section level3">
-<h3>Identify length of JSON objects with <code>json_lengths()</code></h3>
-<p>When investigating JSON data it can be helpful to identify the lengths of the JSON objects or arrays, especialy when they are ‘ragged’ across documents:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">c</span>(<span class="st">'[1, 2, 3]'</span>, <span class="st">'{&quot;k1&quot;: 1, &quot;k2&quot;: 2}'</span>, <span class="st">'1'</span>, {}) %&gt;%<span class="st"> </span>json_lengths
-<span class="co">#&gt;   document.id length</span>
-<span class="co">#&gt; 1           1      3</span>
-<span class="co">#&gt; 2           2      2</span>
-<span class="co">#&gt; 3           3      1</span></code></pre></div>
-</div>
-</div>
-<div id="strategies" class="section level2">
-<h2>Strategies</h2>
-<p>When beginning to work with JSON data, you often don’t have easy access to a schema describing what is in the JSON. One of the benefits of document oriented data structures is that they let developers create data without having to worry about defining the schema explicitly.</p>
-<p>Thus, the first step is to understand the structure of the JSON. Begin by visually inspecting a single record with <code>jsonlite::prettify()</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">'{&quot;key&quot;: &quot;value&quot;, &quot;array&quot;: [1, 2, 3]}'</span> %&gt;%<span class="st"> </span>prettify
-<span class="co">#&gt; {</span>
-<span class="co">#&gt;     &quot;key&quot;: &quot;value&quot;,</span>
-<span class="co">#&gt;     &quot;array&quot;: [</span>
-<span class="co">#&gt;         1,</span>
-<span class="co">#&gt;         2,</span>
-<span class="co">#&gt;         3</span>
-<span class="co">#&gt;     ]</span>
-<span class="co">#&gt; }</span>
-<span class="co">#&gt; </span></code></pre></div>
-<p>However, for complex data or large JSON structures this can be tedious. Instead, use <code>gather_keys</code>, <code>json_types</code> and <code>json_lengths</code> to summarize the data:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">'{&quot;key&quot;: &quot;value&quot;, &quot;array&quot;: [1, 2, 3]}'</span> %&gt;%<span class="st"> </span>
-<span class="st">  </span>gather_keys %&gt;%<span class="st"> </span>json_types %&gt;%<span class="st"> </span>json_lengths
-<span class="co">#&gt;   document.id   key   type length</span>
-<span class="co">#&gt; 1           1   key string      1</span>
-<span class="co">#&gt; 2           1 array  array      3</span></code></pre></div>
-<p>You can repeat this as you move through the JSON data using <code>enter_object()</code> to summarize nested structures as well.</p>
-<p>Once you have an understanding of how you’d like the data to be assembled, begin creating your tidyjson pipeline. Use <code>enter_objects()</code> and <code>gather_array()</code> to navigate the JSON and stack any arrays, and use <code>spread_values()</code> to get at (potentially nested) key-value pairs along the way.</p>
-<p>Before entering any objects, make sure you first use <code>spread_values()</code> to capture any top level identifiers you might need for analytics, summarization or relational uses downstream. If an identifier doesn’t exist, then you can always fall back on the <code>as.tbl_json</code> generated document.id column.</p>
-<p>If you encounter data where information is encoded in both keys and values, then consider using <code>gather_keys()</code> and <code>append_values_X()</code> where <code>X</code> is the type of JSON scalar data you expect in the values.</p>
-<p>Note that there are often situations where there are multiple arrays or objects of differing types that exist at the same level of the JSON hierarchy. In this case, you need to use <code>enter_object()</code> to enter each of them in <em>separate</em> pipelines to create <em>separate</em> <code>data.frames</code> that can then be joined relationally.</p>
-<p>Finally, don’t forget that once you are done with your JSON tidying, you can use <a href="http://github.com/hadley/dplyr">dplyr</a> to continue manipulating the resulting data. <code>dplyr::filter</code>, <code>dplyr::arrange</code> and <code>dplyr::mutate</code> can be used and will preserve the JSON attribute for further tidyjson manipulation. The same is true for the <code>[</code> operator. Other <code>dplyr</code> functions will destroy the JSON attribute, so you will no longer be able to manipulate the JSON data.</p>
-<div id="world-bank-example" class="section level3">
-<h3>World bank example</h3>
-<p>Included in the tidyjson package is a 500 record sample, <code>worldbank</code>, which contains a subset of the JSON data describing world bank funded projects from <a href="http://jsonstudio.com/resources/">jsonstudio</a>.</p>
-<p>First, let’s take a look at a single record. We can use <code>jsonlite::prettify</code> to make the JSON easy to read:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(jsonlite)
-worldbank[<span class="dv">1</span>] %&gt;%<span class="st"> </span>prettify
-<span class="co">#&gt; {</span>
-<span class="co">#&gt;     &quot;_id&quot;: {</span>
-<span class="co">#&gt;         &quot;$oid&quot;: &quot;52b213b38594d8a2be17c780&quot;</span>
-<span class="co">#&gt;     },</span>
-<span class="co">#&gt;     &quot;boardapprovaldate&quot;: &quot;2013-11-12T00:00:00Z&quot;,</span>
-<span class="co">#&gt;     &quot;closingdate&quot;: &quot;2018-07-07T00:00:00Z&quot;,</span>
-<span class="co">#&gt;     &quot;countryshortname&quot;: &quot;Ethiopia&quot;,</span>
-<span class="co">#&gt;     &quot;majorsector_percent&quot;: [</span>
-<span class="co">#&gt;         {</span>
-<span class="co">#&gt;             &quot;Name&quot;: &quot;Education&quot;,</span>
-<span class="co">#&gt;             &quot;Percent&quot;: 46</span>
-<span class="co">#&gt;         },</span>
-<span class="co">#&gt;         {</span>
-<span class="co">#&gt;             &quot;Name&quot;: &quot;Education&quot;,</span>
-<span class="co">#&gt;             &quot;Percent&quot;: 26</span>
-<span class="co">#&gt;         },</span>
-<span class="co">#&gt;         {</span>
-<span class="co">#&gt;             &quot;Name&quot;: &quot;Public Administration, Law, and Justice&quot;,</span>
-<span class="co">#&gt;             &quot;Percent&quot;: 16</span>
-<span class="co">#&gt;         },</span>
-<span class="co">#&gt;         {</span>
-<span class="co">#&gt;             &quot;Name&quot;: &quot;Education&quot;,</span>
-<span class="co">#&gt;             &quot;Percent&quot;: 12</span>
-<span class="co">#&gt;         }</span>
-<span class="co">#&gt;     ],</span>
-<span class="co">#&gt;     &quot;project_name&quot;: &quot;Ethiopia General Education Quality Improvement Project II&quot;,</span>
-<span class="co">#&gt;     &quot;regionname&quot;: &quot;Africa&quot;,</span>
-<span class="co">#&gt;     &quot;totalamt&quot;: 130000000</span>
-<span class="co">#&gt; }</span>
-<span class="co">#&gt; </span></code></pre></div>
-<p>An interesting objects is “majorsector_percent”, which appears to capture the distribution of each project by sector. We also have several funding amounts, such as “totalamt”, which indicate how much money went into each project.</p>
-<p>Let’s grab the “totalamt”, and then gather the array of sectors and their percent allocations.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">amts &lt;-<span class="st"> </span>worldbank %&gt;%
-<span class="st">  </span><span class="kw">spread_values</span>(
-    <span class="dt">total =</span> <span class="kw">jnumber</span>(<span class="st">&quot;totalamt&quot;</span>)
-  ) %&gt;%<span class="st"> </span>
-<span class="st">  </span><span class="kw">enter_object</span>(<span class="st">&quot;majorsector_percent&quot;</span>) %&gt;%<span class="st"> </span>gather_array %&gt;%
-<span class="st">  </span><span class="kw">spread_values</span>(
-    <span class="dt">sector =</span> <span class="kw">jstring</span>(<span class="st">&quot;Name&quot;</span>),
-    <span class="dt">pct =</span> <span class="kw">jnumber</span>(<span class="st">&quot;Percent&quot;</span>)
-  ) %&gt;%
-<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">total.m =</span> total /<span class="st"> </span><span class="dv">10</span>^<span class="dv">6</span>) %&gt;%
-<span class="st">  </span><span class="kw">select</span>(document.id, sector, total.m, pct) %&gt;%
-<span class="st">  </span>tbl_df 
-amts
-<span class="co">#&gt; # A tibble: 1,405 × 4</span>
-<span class="co">#&gt;   document.id                                  sector total.m   pct</span>
-<span class="co">#&gt; *       &lt;int&gt;                                   &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt;</span>
-<span class="co">#&gt; 1           1                               Education     130    46</span>
-<span class="co">#&gt; 2           1                               Education     130    26</span>
-<span class="co">#&gt; 3           1 Public Administration, Law, and Justice     130    16</span>
-<span class="co">#&gt; 4           1                               Education     130    12</span>
-<span class="co">#&gt; # ... with 1,401 more rows</span></code></pre></div>
-<p>Let’s check that the “pct” column really adds up to 100 by project:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">amts %&gt;%<span class="st"> </span>
-<span class="st">  </span><span class="kw">group_by</span>(document.id) %&gt;%
-<span class="st">  </span><span class="kw">summarize</span>(<span class="dt">pct.total =</span> <span class="kw">sum</span>(pct)) %&gt;%
-<span class="st">  </span><span class="kw">group_by</span>(pct.total) %&gt;%
-<span class="st">  </span>tally
-<span class="co">#&gt; # A tibble: 1 × 2</span>
-<span class="co">#&gt;   pct.total     n</span>
-<span class="co">#&gt;       &lt;dbl&gt; &lt;int&gt;</span>
-<span class="co">#&gt; 1       100   500</span></code></pre></div>
-<p>It appears to always add up to 100. Let’s also check the distribution of the total amounts.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(amts$total.m)
-<span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span>
-<span class="co">#&gt;    0.00    0.00   30.00   81.55  100.00 1307.80</span></code></pre></div>
-<p>Many are 0, the mean is $80m and the max is over $1bn.</p>
-<p>Let’s now aggregate by the sector and compute, on a dollar weighted basis, where the money is going by sector:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">amts %&gt;%
-<span class="st">  </span><span class="kw">group_by</span>(sector) %&gt;%
-<span class="st">  </span><span class="kw">summarize</span>(
-    <span class="dt">spend.portion =</span> <span class="kw">sum</span>(total.m *<span class="st"> </span>pct /<span class="st"> </span><span class="dv">100</span>)
-  ) %&gt;%
-<span class="st">  </span>ungroup %&gt;%
-<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">spend.dist =</span> spend.portion /<span class="st"> </span><span class="kw">sum</span>(spend.portion)) %&gt;%
-<span class="st">  </span><span class="kw">arrange</span>(<span class="kw">desc</span>(spend.dist))
-<span class="co">#&gt; # A tibble: 10 × 3</span>
-<span class="co">#&gt;                                    sector spend.portion spend.dist</span>
-<span class="co">#&gt;                                     &lt;chr&gt;         &lt;dbl&gt;      &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 Public Administration, Law, and Justice      8698.143 0.25477320</span>
-<span class="co">#&gt; 2                          Transportation      5878.931 0.17219698</span>
-<span class="co">#&gt; 3        Health and other social services      4312.514 0.12631581</span>
-<span class="co">#&gt; 4                       Energy and mining      3360.977 0.09844478</span>
-<span class="co">#&gt; # ... with 6 more rows</span></code></pre></div>
-</div>
-<div id="companies-example" class="section level3">
-<h3>Companies example</h3>
-<p>Also included in the tidyjson package is a 1000 record sample, <code>companies</code>, which contains a subset of the JSON data describing startups from <a href="http://jsonstudio.com/resources/">jsonstudio</a>.</p>
-<p>Instead of using <code>jsonlite::prettify</code>, let’s quickly summarize the keys using tidyjson and visualize the results:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(ggplot2)
-key_stats &lt;-<span class="st"> </span>companies %&gt;%<span class="st"> </span>
-<span class="st">  </span>gather_keys %&gt;%<span class="st"> </span>json_types %&gt;%<span class="st"> </span><span class="kw">group_by</span>(key, type) %&gt;%<span class="st"> </span>tally
-key_stats
-<span class="co">#&gt; Source: local data frame [64 x 3]</span>
-<span class="co">#&gt; Groups: key [?]</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt;            key   type     n</span>
-<span class="co">#&gt;          &lt;chr&gt; &lt;fctr&gt; &lt;int&gt;</span>
-<span class="co">#&gt; 1          _id object  1000</span>
-<span class="co">#&gt; 2  acquisition object   149</span>
-<span class="co">#&gt; 3  acquisition   null   851</span>
-<span class="co">#&gt; 4 acquisitions  array  1000</span>
-<span class="co">#&gt; # ... with 60 more rows</span>
-<span class="kw">ggplot</span>(key_stats, <span class="kw">aes</span>(key, n, <span class="dt">fill =</span> type)) +
-<span class="st">  </span><span class="kw">geom_bar</span>(<span class="dt">stat =</span> <span class="st">&quot;identity&quot;</span>, <span class="dt">position =</span> <span class="st">&quot;stack&quot;</span>) +
-<span class="st">  </span><span class="kw">coord_flip</span>()</code></pre></div>
-<p><img src="data:image/png;base64,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" /><!-- --></p>
-<p>Suppose we are interested in exploring the funding round data. Let’s examine it’s structure:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">companies %&gt;%
-<span class="st">  </span><span class="kw">enter_object</span>(<span class="st">&quot;funding_rounds&quot;</span>) %&gt;%
-<span class="st">  </span>gather_array %&gt;%<span class="st"> </span>
-<span class="st">  </span>gather_keys %&gt;%<span class="st"> </span>json_types %&gt;%<span class="st"> </span><span class="kw">group_by</span>(key, type) %&gt;%<span class="st"> </span>tally %&gt;%
-<span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(key, n, <span class="dt">fill =</span> type)) +
-<span class="st">    </span><span class="kw">geom_bar</span>(<span class="dt">stat =</span> <span class="st">&quot;identity&quot;</span>, <span class="dt">position =</span> <span class="st">&quot;stack&quot;</span>) +
-<span class="st">    </span><span class="kw">coord_flip</span>()</code></pre></div>
-<p><img src="data:image/png;base64,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" /><!-- --></p>
-<p>Now, referencing the above visualizations, we can structure some of the data for analysis:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rounds &lt;-<span class="st"> </span>companies %&gt;%
-<span class="st">  </span><span class="kw">spread_values</span>(
-    <span class="dt">id =</span> <span class="kw">jstring</span>(<span class="st">&quot;_id&quot;</span>, <span class="st">&quot;$oid&quot;</span>),
-    <span class="dt">name =</span> <span class="kw">jstring</span>(<span class="st">&quot;name&quot;</span>),
-    <span class="dt">category =</span> <span class="kw">jstring</span>(<span class="st">&quot;category_code&quot;</span>)
-  ) %&gt;%
-<span class="st">  </span><span class="kw">enter_object</span>(<span class="st">&quot;funding_rounds&quot;</span>) %&gt;%
-<span class="st">  </span>gather_array %&gt;%
-<span class="st">  </span><span class="kw">spread_values</span>(
-    <span class="dt">round =</span> <span class="kw">jstring</span>(<span class="st">&quot;round_code&quot;</span>),
-    <span class="dt">raised =</span> <span class="kw">jnumber</span>(<span class="st">&quot;raised_amount&quot;</span>)
-  )
-rounds %&gt;%<span class="st"> </span>glimpse
-<span class="co">#&gt; Observations: 696</span>
-<span class="co">#&gt; Variables: 7</span>
-<span class="co">#&gt; $ document.id &lt;int&gt; 1, 1, 1, 1, 1, 5, 5, 8, 8, 8, 14, 15, 16, 19, 27, ...</span>
-<span class="co">#&gt; $ id          &lt;chr&gt; &quot;52cdef7e4bab8bd67529bd0c&quot;, &quot;52cdef7e4bab8bd67529b...</span>
-<span class="co">#&gt; $ name        &lt;chr&gt; &quot;OutSmart Power Systems&quot;, &quot;OutSmart Power Systems&quot;...</span>
-<span class="co">#&gt; $ category    &lt;chr&gt; &quot;hardware&quot;, &quot;hardware&quot;, &quot;hardware&quot;, &quot;hardware&quot;, &quot;h...</span>
-<span class="co">#&gt; $ array.index &lt;int&gt; 1, 2, 3, 4, 5, 1, 2, 1, 2, 3, 1, 1, 1, 1, 1, 2, 3,...</span>
-<span class="co">#&gt; $ round       &lt;chr&gt; &quot;seed&quot;, &quot;partial&quot;, &quot;debt_round&quot;, &quot;b&quot;, &quot;a&quot;, &quot;a&quot;, &quot;d...</span>
-<span class="co">#&gt; $ raised      &lt;dbl&gt; 2000000, 200000, 2606500, 1500000, 3600000, 360000...</span></code></pre></div>
-<p>Now we can summarize by category and round how much is raised on average by round:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rounds %&gt;%
-<span class="st">  </span><span class="kw">filter</span>(
-    !<span class="kw">is.na</span>(raised),
-    round %in%<span class="st"> </span><span class="kw">c</span>(<span class="st">'a'</span>, <span class="st">'b'</span>, <span class="st">'c'</span>),
-    category %in%<span class="st"> </span><span class="kw">c</span>(<span class="st">'enterprise'</span>, <span class="st">'software'</span>, <span class="st">'web'</span>)
-  ) %&gt;%
-<span class="st">  </span><span class="kw">group_by</span>(category, round) %&gt;%
-<span class="st">  </span><span class="kw">summarize</span>(<span class="dt">raised =</span> <span class="kw">mean</span>(raised)) %&gt;%
-<span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(round, raised /<span class="st"> </span><span class="dv">10</span>^<span class="dv">6</span>, <span class="dt">fill =</span> round)) +
-<span class="st">    </span><span class="kw">geom_bar</span>(<span class="dt">stat =</span> <span class="st">&quot;identity&quot;</span>) +
-<span class="st">    </span><span class="kw">coord_flip</span>() +
-<span class="st">    </span><span class="kw">labs</span>(<span class="dt">y =</span> <span class="st">&quot;Raised (m)&quot;</span>) +
-<span class="st">    </span><span class="kw">facet_grid</span>(. ~<span class="st"> </span>category)</code></pre></div>
-<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div id="gather-and-append" class="section level3">
+<h3>Gather and append</h3>
+<p>Useful when data is stored in object names as well as values</p>
+<p><code>gather_object %&gt;% append_values_X</code></p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1">json &lt;-<span class="st"> '{&quot;2015&quot;: 5, &quot;2016&quot;: 10}'</span></a>
+<a class="sourceLine" id="cb15-2" data-line-number="2">json <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">gather_object</span>(<span class="st">&quot;year&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">append_values_number</span>(<span class="st">&quot;count&quot;</span>)</a>
+<a class="sourceLine" id="cb15-3" data-line-number="3"><span class="co">#&gt; # A tbl_json: 2 x 3 tibble with a &quot;JSON&quot; attribute</span></a>
+<a class="sourceLine" id="cb15-4" data-line-number="4"><span class="co">#&gt;   `attr(., &quot;JSON&quot;)` document.id year  count</span></a>
+<a class="sourceLine" id="cb15-5" data-line-number="5"><span class="co">#&gt;   &lt;chr&gt;                   &lt;int&gt; &lt;chr&gt; &lt;dbl&gt;</span></a>
+<a class="sourceLine" id="cb15-6" data-line-number="6"><span class="co">#&gt; 1 5                           1 2015      5</span></a>
+<a class="sourceLine" id="cb15-7" data-line-number="7"><span class="co">#&gt; 2 10                          1 2016     10</span></a></code></pre></div>
 </div>
 </div>
-<div id="future-work" class="section level2">
-<h2>Future work</h2>
-<p>This package is still a work in progress. Significant additional features we are contemplating include:</p>
+<div id="getting-started-with-json-data" class="section level2">
+<h2>Getting started with JSON data</h2>
+<p>The first step in using tidyjson is to get your data into a <code>tbl_json</code> object. All tidyjson functions automatically coerce objects into <code>tbl_json</code> if they are not already, so you may be able to just start manipulating your data directly.</p>
+<p>But if not, you can use <code>as.tbl_json</code> directly. Here are examples for common scenarios:</p>
+<div id="character-vector" class="section level3">
+<h3>Character vector</h3>
+<p>The simplest case is when your JSON data is already in R as a character vector, like the <code>worldbank</code> data:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1">worldbank <span class="op">%&gt;%</span><span class="st"> </span>as.tbl_json</a>
+<a class="sourceLine" id="cb16-2" data-line-number="2"><span class="co">#&gt; # A tbl_json: 500 x 1 tibble with a &quot;JSON&quot; attribute</span></a>
+<a class="sourceLine" id="cb16-3" data-line-number="3"><span class="co">#&gt;   `attr(., &quot;JSON&quot;)`        document.id</span></a>
+<a class="sourceLine" id="cb16-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt;                          &lt;int&gt;</span></a>
+<a class="sourceLine" id="cb16-5" data-line-number="5"><span class="co">#&gt; 1 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot;           1</span></a>
+<a class="sourceLine" id="cb16-6" data-line-number="6"><span class="co">#&gt; 2 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot;           2</span></a>
+<a class="sourceLine" id="cb16-7" data-line-number="7"><span class="co">#&gt; 3 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot;           3</span></a>
+<a class="sourceLine" id="cb16-8" data-line-number="8"><span class="co">#&gt; 4 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot;           4</span></a>
+<a class="sourceLine" id="cb16-9" data-line-number="9"><span class="co">#&gt; # … with 496 more rows</span></a></code></pre></div>
+<p>If this generates errors, then likely your JSON data is malformed:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1">bad_json &lt;-<span class="st"> '{&quot;key&quot;: &quot;value&quot;'</span></a>
+<a class="sourceLine" id="cb17-2" data-line-number="2">bad_json <span class="op">%&gt;%</span><span class="st"> </span>as.tbl_json</a>
+<a class="sourceLine" id="cb17-3" data-line-number="3"><span class="co">#&gt; Error: parse error: premature EOF</span></a>
+<a class="sourceLine" id="cb17-4" data-line-number="4"><span class="co">#&gt;                                        {&quot;key&quot;: &quot;value&quot;</span></a>
+<a class="sourceLine" id="cb17-5" data-line-number="5"><span class="co">#&gt;                      (right here) ------^</span></a></code></pre></div>
+<p>tidyjson uses <code>jsonlite::fromJSON</code> to parse the JSON, and so will print out a useful error message.</p>
+</div>
+<div id="single-array" class="section level3">
+<h3>Single array</h3>
+<p>Many APIs will return multiple documents in a single array, like the <code>issues</code> data from github.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1">issues <span class="op">%&gt;%</span><span class="st"> </span>as.tbl_json</a>
+<a class="sourceLine" id="cb18-2" data-line-number="2"><span class="co">#&gt; # A tbl_json: 1 x 1 tibble with a &quot;JSON&quot; attribute</span></a>
+<a class="sourceLine" id="cb18-3" data-line-number="3"><span class="co">#&gt;   `attr(., &quot;JSON&quot;)`       document.id</span></a>
+<a class="sourceLine" id="cb18-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt;                         &lt;int&gt;</span></a>
+<a class="sourceLine" id="cb18-5" data-line-number="5"><span class="co">#&gt; 1 &quot;[{\&quot;url\&quot;:\&quot;https:...&quot;           1</span></a></code></pre></div>
+<p>A single call to gather_array makes this data look like the <code>worldbank</code> data:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1">issues <span class="op">%&gt;%</span><span class="st"> </span>as.tbl_json <span class="op">%&gt;%</span><span class="st"> </span>gather_array</a>
+<a class="sourceLine" id="cb19-2" data-line-number="2"><span class="co">#&gt; # A tbl_json: 30 x 2 tibble with a &quot;JSON&quot; attribute</span></a>
+<a class="sourceLine" id="cb19-3" data-line-number="3"><span class="co">#&gt;   `attr(., &quot;JSON&quot;)`       document.id array.index</span></a>
+<a class="sourceLine" id="cb19-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt;                         &lt;int&gt;       &lt;int&gt;</span></a>
+<a class="sourceLine" id="cb19-5" data-line-number="5"><span class="co">#&gt; 1 &quot;{\&quot;url\&quot;:\&quot;https:/...&quot;           1           1</span></a>
+<a class="sourceLine" id="cb19-6" data-line-number="6"><span class="co">#&gt; 2 &quot;{\&quot;url\&quot;:\&quot;https:/...&quot;           1           2</span></a>
+<a class="sourceLine" id="cb19-7" data-line-number="7"><span class="co">#&gt; 3 &quot;{\&quot;url\&quot;:\&quot;https:/...&quot;           1           3</span></a>
+<a class="sourceLine" id="cb19-8" data-line-number="8"><span class="co">#&gt; 4 &quot;{\&quot;url\&quot;:\&quot;https:/...&quot;           1           4</span></a>
+<a class="sourceLine" id="cb19-9" data-line-number="9"><span class="co">#&gt; # … with 26 more rows</span></a></code></pre></div>
+</div>
+<div id="list" class="section level3">
+<h3>List</h3>
+<p>If your JSON is a list of character strings, you can use `purrr::flatten_chr’ to flatten it into a character vector and then proceed as usual:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="kw">library</span>(purrr)</a>
+<a class="sourceLine" id="cb20-2" data-line-number="2"><span class="kw">list</span>(<span class="st">'1'</span>, <span class="st">'2'</span>) <span class="op">%&gt;%</span><span class="st"> </span>flatten_chr <span class="op">%&gt;%</span><span class="st"> </span>as.tbl_json</a>
+<a class="sourceLine" id="cb20-3" data-line-number="3"><span class="co">#&gt; # A tbl_json: 2 x 1 tibble with a &quot;JSON&quot; attribute</span></a>
+<a class="sourceLine" id="cb20-4" data-line-number="4"><span class="co">#&gt;   `attr(., &quot;JSON&quot;)` document.id</span></a>
+<a class="sourceLine" id="cb20-5" data-line-number="5"><span class="co">#&gt;   &lt;chr&gt;                   &lt;int&gt;</span></a>
+<a class="sourceLine" id="cb20-6" data-line-number="6"><span class="co">#&gt; 1 1                           1</span></a>
+<a class="sourceLine" id="cb20-7" data-line-number="7"><span class="co">#&gt; 2 2                           2</span></a></code></pre></div>
+</div>
+<div id="data-frame" class="section level3">
+<h3>Data frame</h3>
+<p>If you extracted JSON from a table in a database into a data frame, then likely you already have other columns in the data frame you would like to retain. You can use then <code>json.column</code> argument to <code>as.tbl_json</code> to specify which column contains the JSON of interest:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1">df &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">id =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="dt">json =</span> <span class="kw">list</span>(<span class="st">'[1, 2]'</span>, <span class="st">'[3, 4]'</span>))</a>
+<a class="sourceLine" id="cb21-2" data-line-number="2">df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as.tbl_json</span>(<span class="dt">json.column =</span> <span class="st">&quot;json&quot;</span>)</a>
+<a class="sourceLine" id="cb21-3" data-line-number="3"><span class="co">#&gt; # A tbl_json: 2 x 1 tibble with a &quot;JSON&quot; attribute</span></a>
+<a class="sourceLine" id="cb21-4" data-line-number="4"><span class="co">#&gt;   `attr(., &quot;JSON&quot;)`    id</span></a>
+<a class="sourceLine" id="cb21-5" data-line-number="5"><span class="co">#&gt;   &lt;chr&gt;             &lt;int&gt;</span></a>
+<a class="sourceLine" id="cb21-6" data-line-number="6"><span class="co">#&gt; 1 [1,2]                 1</span></a>
+<a class="sourceLine" id="cb21-7" data-line-number="7"><span class="co">#&gt; 2 [3,4]                 2</span></a></code></pre></div>
+</div>
+<div id="file" class="section level3">
+<h3>File</h3>
+<p>If your JSON is in a file, like in the <a href="http://jsonlines.org/">jsonlines</a> format, then you can use <code>read_json</code> to read the file into a <code>tbl_json</code> object directly.</p>
+</div>
+<div id="json-included-in-the-package" class="section level3">
+<h3>JSON included in the package</h3>
+<p>The tidyjson package comes with several JSON example datasets:</p>
 <ul>
-<li>Summarizing JSON structures and visualizing them to make working with new JSON easier</li>
-<li>Keeping the JSON in a parsed C++ data structure, and using rcpp to speed up the manipulation of JSON</li>
-<li>Push computations to document oriented databases like MongoDB</li>
+<li><p><code>commits</code>: commit data for the <a href="https://github.com/hadley/dplyr">dplyr</a> repo from github API</p></li>
+<li><p><code>issues</code>: issue data for the <a href="https://github.com/hadley/dplyr">dplyr</a> repo from github API</p></li>
+<li><p><code>worldbank</code>: world bank funded projects from <a href="http://jsonstudio.com/resources/">jsonstudio</a></p></li>
+<li><p><code>companies</code>: startup company data from <a href="http://jsonstudio.com/resources/">jsonstudio</a></p></li>
 </ul>
+<p>Each dataset has some example tidyjson queries in <code>help(commits)</code>, <code>help(issues)</code>, <code>help(worldbank)</code> and <code>help(companies)</code>.</p>
+</div>
 </div>
 
+
+
+<!-- code folding -->
 
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
@@ -667,7 +685,7 @@ rounds %&gt;%<span class="st"> </span>glimpse
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
 </script>

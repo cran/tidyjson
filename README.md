@@ -1,299 +1,237 @@
-# tidyjson
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+tidyjson
+========
 
-[![Build Status](https://travis-ci.org/sailthru/tidyjson.png?branch=master)](https://travis-ci.org/sailthru/tidyjson)
+[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/tidyjson)](https://cran.r-project.org/package=tidyjson)
+[![Build
+Status](https://travis-ci.org/colearendt/tidyjson.svg?branch=master)](https://travis-ci.org/colearendt/tidyjson)
+[![AppVeyor Build
+Status](https://ci.appveyor.com/api/projects/status/github/colearendt/tidyjson?branch=master&svg=true)](https://ci.appveyor.com/project/colearendt/tidyjson)
 
-tidyjson is a complementary set of tools to [tidyr](https://github.com/hadley/tidyr)
-for working with JSON data. It's primary objective is to turn JSON data into 
-[tidy](http://vita.had.co.nz/papers/tidy-data.pdf) tables for downstream use by 
-[dplyr](http://github.com/hadley/dplyr) or other relational, analytical or 
-machine learning frameworks in R. Behind the scenes, tidyjson uses 
-[jsonlite](https://github.com/jeroenooms/jsonlite) to parse the JSON data. 
-tidyjson is also designed to be used with the `%>%` operator imported into dplyr
-from the [magrittr](https://github.com/smbache/magrittr) package.
+[![Coverage
+Status](https://codecov.io/github/colearendt/tidyjson/coverage.svg?branch=master)](https://codecov.io/github/colearendt/tidyjson?branch=master)
+[![CRAN
+Activity](http://cranlogs.r-pkg.org/badges/tidyjson)](https://CRAN.R-project.org/package=tidyjson)
+[![CRAN
+History](http://cranlogs.r-pkg.org/badges/grand-total/tidyjson)](https://CRAN.R-project.org/package=tidyjson)
 
-tidyjson operates on the following principles:
+![tidyjson
+graphs](https://cloud.githubusercontent.com/assets/2284427/18217882/1b3b2db4-7114-11e6-8ba3-07938f1db9af.png)
 
-* Allow for structuring in tidy form arbitrarily nested (arrays or objects) JSON
-* Naturally handle 'ragged' arrays and / or objects (varying lengths by document)
-* Allow for extraction of data in values *or* key names
-* Integrate with pipelines built on `dplyr` and the `%>%` operator
-* Ensure edge cases are handled correctly (especially empty data)
+tidyjson provides tools for turning complex [json](http://www.json.org/) into
+tidy data.
 
-You can install tidyjson from github directly by running:
+Installation
+------------
 
-```R
-devtools::install_github("sailthru/tidyjson")
+Get the released version from CRAN:
+
+``` r
+install.packages("tidyjson")
 ```
 
-tidyjson comes with several JSON examples:
+or the development version from github:
 
-* `commits`: commit data for the dplyr repo from github API
-* `issues`: issue data for the dplyr repo from github API
-* `worldbank`: world bank funded projects from 
-[jsonstudio](http://jsonstudio.com/resources/)
-* `companies`: startup company data from 
-[jsonstudio](http://jsonstudio.com/resources/)
-
-Note that the tidyjson package closely follows the definition and semantics of 
-the [JSON standard](http://json.org/).
-
-An example of how tidyjson works is as follows:
-
-```R
-library(tidyjson)   # this package
-library(dplyr)      # for %>% and other dplyr functions
-
-json <- '[{"name": "bob", "age": 32}, {"name": "susan", "age": 54}]'
-
-json %>%            # Use the %>% pipe operator to pass json through a pipeline 
-  as.tbl_json %>%   # Parse the JSON and setup a 'tbl_json' object
-  gather_array %>%  # Gather (stack) the array by index
-  spread_values(    # Spread (widen) values to widen the data.frame
-    user.name = jstring("name"),  # Extract the "name" object as a character column "user.name"
-    user.age = jnumber("age")     # Extract the "age" object as a numeric column "user.age"
-  )
-#  document.id array.index user.name user.age
-#1           1           1       bob       32
-#2           1           2     susan       54
+``` r
+devtools::install_github("colearendt/tidyjson")
 ```
 
-For more complex uses, see the examples in `help(commits)`, `help(issues)`,
-`help(worldbank)` and `help(companies)`.
+Examples
+--------
 
-## `tbl_json`
+The following example takes a character vector of 500 documents in the
+`worldbank` dataset and spreads out all objects.  
+Every JSON object key gets its own column with types inferred, so long
+as the key does not represent an array. When `recursive=TRUE` (the
+default behavior), `spread_all` does this recursively for nested objects
+and creates column names using the `sep` parameter (i.e. `{"a":{"b":1}}`
+with `sep='.'` would generate a single column: `a.b`).
 
-The first step in using tidyjson is to convert your JSON into a `tbl_json` object.
-Almost every function in tidyjson accepts a `tbl_json` object as it's first 
-parameter, and returns a `tbl_json` object for downstream use. `tbl_json` 
-inherits from `dplyr::tbl`.
+``` r
+library(dplyr)
+library(tidyjson)
 
-A `tbl_json` object is comprised of a `data.frame` with an additional attribute,
-`JSON`, that contains a list of JSON data of the same length as the number of
-rows in the `data.frame`. Each row of data in the `data.frame` corresponds to the
-JSON found in the same index of the `JSON` attribute.
-
-The easiest way to construct a `tbl_json` object is directly from a character
-string or vector.
-
-```R
-# Will return a 1 row data.frame with a length 1 JSON attribute
-'{"key": "value"}' %>% as.tbl_json
-
-# Will still return a 1 row data.frame with a length 1 JSON attribute as
-# the character string is of length 1 (even though it contains a JSON array of
-# length 2)
-'[{"key1": "value1"}, {"key2": "value2"}]' %>% as.tbl_json
-
-# Will return a 2 row data.frame with a length 2 JSON attribute
-c('{"key1": "value1"}', '{"key2": "value2"}') %>% as.tbl_json
+worldbank %>% spread_all
+#> # A tbl_json: 500 x 8 tibble with a "JSON" attribute
+#>    `attr(., "JSON"… document.id boardapprovalda… closingdate
+#>    <chr>                  <int> <chr>            <chr>      
+#>  1 "{\"_id\":{\"$o…           1 2013-11-12T00:0… 2018-07-07…
+#>  2 "{\"_id\":{\"$o…           2 2013-11-04T00:0… <NA>       
+#>  3 "{\"_id\":{\"$o…           3 2013-11-01T00:0… <NA>       
+#>  4 "{\"_id\":{\"$o…           4 2013-10-31T00:0… <NA>       
+#>  5 "{\"_id\":{\"$o…           5 2013-10-31T00:0… 2019-04-30…
+#>  6 "{\"_id\":{\"$o…           6 2013-10-31T00:0… <NA>       
+#>  7 "{\"_id\":{\"$o…           7 2013-10-29T00:0… 2019-06-30…
+#>  8 "{\"_id\":{\"$o…           8 2013-10-29T00:0… <NA>       
+#>  9 "{\"_id\":{\"$o…           9 2013-10-29T00:0… 2018-12-31…
+#> 10 "{\"_id\":{\"$o…          10 2013-10-29T00:0… 2014-12-31…
+#> # ... with 490 more rows, and 5 more variables: countryshortname <chr>,
+#> #   project_name <chr>, regionname <chr>, totalamt <dbl>, `_id.$oid` <chr>
 ```
 
-Behind the scenes, `as.tbl_json` is parsing the JSON strings and creating a
-data.frame with 1 column, `document.id`, which keeps track of the character 
-vector position (index) where the JSON data came from.
+Some objects in `worldbank` are arrays, which are not handled by
+`spread_all`. This example shows how to quickly summarize the top level
+structure of a JSON collection
 
-## Verbs
-
-The rest of tidyjson is comprised of various verbs with operate on `tbl_json`
-objects and return `tbl_json` objects. They are meant to be used in a pipeline
-with the `%>%` operator.
-
-Note that these verbs all operate on *both* the underlying data.frame and the
-JSON, iteratively moving data from the JSON into the data.frame. Any
-modifications of the underlying data.frame outside of these operations
-may produce unintended consequences where the data.frame and JSON become out of
-synch.
-
-### `json_types`
-
-`json_types` inspects the JSON associated with each row of the data.frame, and
-adds a new column (`type` by default) that identifies the type according to the
-[JSON standard](http://json.org/).
-
-```R
-types <- c('{"a": 1}', '[1, 2]', '"a"', '1', 'true', 'null') %>% as.tbl_json %>%
-   json_types
-types$type
-#[1] object  array   string  number  logical null
-#Levels: object array string number logical null
+``` r
+worldbank %>% gather_object %>% json_types %>% count(name, type)
+#> # A tibble: 8 x 3
+#>   name                type       n
+#>   <chr>               <fct>  <int>
+#> 1 _id                 object   500
+#> 2 boardapprovaldate   string   500
+#> 3 closingdate         string   370
+#> 4 countryshortname    string   500
+#> 5 majorsector_percent array    500
+#> 6 project_name        string   500
+#> 7 regionname          string   500
+#> 8 totalamt            number   500
 ```
 
-This is particularly useful for inspecting your JSON data types, and can added
-after `gather_array` (or `gather_keys`) to inspect the types of the elements
-(or values) in arrays (or objects).
+In order to capture the data in the `majorsector_percent` array, we can
+use `enter_object` to enter into that object, `gather_array` to stack
+the array and `spread_all` to capture the object items under the array.
 
-### `gather_array`
-
-`gather_array` takes JSON arrays and duplicates the rows in the data.frame to
-correspond to the indices of the array, and puts the elements of the array into
-the JSON attribute. This is equivalent to "stacking" the array in the
-data.frame, and lets you continue to manipulate the remaining JSON in the
-elements of the array.
-
-```R
-'[1, "a", {"k": "v"}]' %>% as.tbl_json %>% gather_array %>% json_types
-#  document.id array.index   type
-#1           1           1 number
-#2           1           2 string
-#3           1           3 object
+``` r
+worldbank %>%
+  enter_object(majorsector_percent) %>%
+  gather_array %>%
+  spread_all %>%
+  select(-document.id, -array.index)
+#> # A tbl_json: 1,405 x 2 tibble with a "JSON" attribute
+#>    `attr(., "JSON")`       Name                                    Percent
+#>    <chr>                   <chr>                                     <dbl>
+#>  1 "{\"Name\":\"Educat..." Education                                    46
+#>  2 "{\"Name\":\"Educat..." Education                                    26
+#>  3 "{\"Name\":\"Public..." Public Administration, Law, and Justice      16
+#>  4 "{\"Name\":\"Educat..." Education                                    12
+#>  5 "{\"Name\":\"Public..." Public Administration, Law, and Justice      70
+#>  6 "{\"Name\":\"Public..." Public Administration, Law, and Justice      30
+#>  7 "{\"Name\":\"Transp..." Transportation                              100
+#>  8 "{\"Name\":\"Health..." Health and other social services            100
+#>  9 "{\"Name\":\"Indust..." Industry and trade                           50
+#> 10 "{\"Name\":\"Indust..." Industry and trade                           40
+#> # ... with 1,395 more rows
 ```
 
-This allows you to *enter into* an array and begin processing it's elements
-with other tidyjson functions. It retains the array.index in case the relative
-position of elements in the array is useful information.
+API
+---
 
-### `gather_keys`
+### Spreading objects into columns
 
-Similar to `gather_array`, `gather_keys` takes JSON objects and duplicates the
-rows in the data.frame to correspond to the keys of the object, and puts the 
-values of the object into the JSON attribute.
+-   `spread_all()` for spreading all object values into new columns,
+    with nested objects having concatenated names
 
-```R
-'{"name": "bob", "age": 32}' %>% as.tbl_json %>% gather_keys %>% json_types
-#  document.id  key   type
-#1           1 name string
-#2           1  age number
-```
+-   `spread_values()` for specifying a subset of object values to spread
+    into new columns using the `json_chr()`, `json_dbl()` and
+    `json_lgl()` functions. It is possible to specify multiple
+    parameters to extract data from nested objects (i.e.
+    `json_chr('a','b')`).
 
-This allows you to *enter into* the keys of the objects just like `gather_array`
-let you enter elements of the array.
+### Object navigation
 
-### `spread_values`
+-   `enter_object()` for entering into an object by name, discarding all
+    other JSON (and rows without the corresponding object name) and
+    allowing further operations on the object value
 
-`spread_values` lets you dive into (potentially nested) JSON objects and
-extract specific values. `spread_values` takes `jstring`, `jnumber` or 
-`jlogical` function calls as arguments in order to specify the type of the
-data that should be captured at each desired key location. 
+-   `gather_object()` for stacking all object name-value pairs by name,
+    expanding the rows of the `tbl_json` object accordingly
 
-These values can be of varying types at varying depths, e.g.,
+### Array navigation
 
-```R
-'{"name": {"first": "bob", "last": "jones"}, "age": 32}' %>% as.tbl_json %>% 
-  spread_values(first.name = jstring("name", "first"), age = jnumber("age"))
-#  document.id first.name age
-#1           1        bob  32
-```
+-   `gather_array()` for stacking all array values by index, expanding
+    the rows of the `tbl_json` object accordingly
 
-### `append_values_X`
+### JSON inspection
 
-The `append_values_X` functions let you take the remaining JSON and add it as
-a column X (for X in "string", "number", "logical") insofar as it is of the
-JSON type specified. For example:
+-   `json_types()` for identifying JSON data types
 
-```R
-'{"first": "bob", "last": "jones"}' %>% as.tbl_json %>% 
-  gather_keys() %>% append_values_string()
-#  document.id   key string
-#1           1 first    bob
-#2           1  last  jones
-```
+-   `json_length()` for computing the length of JSON data (can be larger
+    than `1` for objects and arrays)
 
-Any values that do not conform to the type specified will be NA in the resulting
-column. This includes other scalar types (e.g., numbers or logicals if you are
-using append_values_string) and *also* any rows where the JSON is still an
-object or an array.
+-   `json_complexity()` for computing the length of the unnested JSON,
+    i.e., how many terminal leaves there are in a complex JSON structure
 
-### `enter_object`
+-   `is_json` family of functions for testing the type of JSON data
 
-`enter_object` lets you dive into a specific object key in the JSON attribute,
-so that all further tidyjson calls happen inside that object (all other JSON 
-data outside the object is discarded). If the object doesn't exist for a given
-row / index, then that data.frame row will be discarded.
+### JSON summarization
 
-```R
-c('{"name": "bob", "children": ["sally", "george"]}', '{"name": "anne"}') %>% 
-  as.tbl_json %>% spread_values(parent.name = jstring("name")) %>%
-  enter_object("children") %>% 
-  gather_array %>% append_values_string("children")
-#  document.id parent.name array.index children
-#1           1         bob           1    sally
-#2           1         bob           2   george
-```
+-   `json_structure()` for creating a single fixed column data.frame
+    that recursively structures arbitrary JSON data
 
-This is useful when you want to limit your data to just information found in
-a specific key.
+-   `json_schema()` for representing the schema of complex JSON, unioned
+    across disparate JSON documents, and collapsing arrays to their most
+    complex type representation
 
-## Strategies
+### Creating tbl\_json objects
 
-When beginning to work with JSON data, you often don't have easy access to a
-schema describing what is in the JSON. One of the benefits of document oriented
-data structures is that they let developers create data without having to worry
-about defining the schema explicitly.
+-   `as.tbl_json()` for converting a string or character vector into a
+    `tbl_json` object, or for converting a `data.frame` with a JSON
+    column using the `json.column` argument
 
-Thus, the first step is to usually understand the structure of the JSON. A first
-step can be to look at individual records with `jsonlite::prettify`:
+-   `tbl_json()` for combining a `data.frame` and associated `list`
+    derived from JSON data into a `tbl_json` object
 
-```
-library(jsonlite)
-prettify(json)
-```
+-   `read_json()` for reading JSON data from a file
 
-Examining various random records can begin to give you a sense of what the JSON
-contains and how it it structured. However, keep in mind that in many cases
-documents that are missing data (either unknown or unrelevant) may omit the
-entire JSON structure.
+### Converting tbl\_json objects
 
-Next, you can begin working with the data in R.
+-   `as.character.tbl_json` for converting the JSON attribute of a
+    `tbl_json` object back into a JSON character string
 
-```R
-# Inspect the types of objects
-read_json("myfile.json") %>% json_types %>% table
-```
+### Included JSON data
 
-Then, if you want to work with a single row of data for each JSON object, use
-`spread_values` to get at (potentially nested) key-value pairs.
+-   `commits`: commit data for the dplyr repo from github API
 
-If all you care about is data from a certain sub-object, then use `enter_object`
-to dive into that object directly. Make sure you first use `spread_values` to
-capture any top level identifiers you might need for analytics, summarization or
-relational uses downstream.
+-   `issues`: issue data for the dplyr repo from github API
 
-If you want to access arrays, use `gather_array` to stack their elements, and
-then proceed as though you had separate documents. (Again, first spread any
-top-level keys you need.)
+-   `worldbank`: world bank funded projects from
+    [jsonstudio](http://jsonstudio.com/resources/)
 
-Finally, if you have data where information is encoded in both keys and values,
-then consider using `gather_keys` and `append_values_X` where `X` is the type
-of JSON scalar data you expect in the values.
+-   `companies`: startup company data from
+    [jsonstudio](http://jsonstudio.com/resources/)
 
-It's important to remember that any of the above can be combined together
-iteratively to do some fairly complex data extraction. For example:
+Philosophy
+----------
 
-```R
-json <- '{
-  "name": "bob",
-  "shopping cart": 
-    [
-      {
-        "date": "2014-04-02",
-        "basket": {"books": 2, "shirts": 0}
-      },
-      {
-        "date": "2014-08-23",
-        "basket": {"books": 1}
-      }
-    ]
-}'
-json %>% as.tbl_json %>% 
-  spread_values(customer = jstring("name")) %>% # Keep the customer name
-  enter_object("shopping cart") %>%             # Look at their cart
-  gather_array %>%                              # Expand the data.frame and dive into each array element
-  spread_values(date = jstring("date")) %>%     # Keep the date of the cart
-  enter_object("basket") %>%                    # Look at their basket
-  gather_keys("product") %>%                    # Expand the data.frame for each product and capture it's name
-  append_values_number("quantity")              # Capture the values as the quantity
-#  document.id customer array.index       date product quantity
-#1           1      bob           1 2014-04-02   books        2
-#2           1      bob           1 2014-04-02  shirts        0
-#3           1      bob           2 2014-08-23   books        1
-```
+The goal is to turn complex JSON data, which is often represented as
+nested lists, into tidy data frames that can be more easily manipulated.
 
-Note that there are often situations where there are multiple arrays or objects
-of differing types that exist at the same level of the JSON hierarchy. In this
-case, you need to use `enter_object` to enter each of them in *separate*
-pipelines to create *separate* `data.frames` that can then be joined 
-relationally.
+-   Work on a single JSON document, or on a collection of related
+    documents
 
-Finally, don't forget that once you are done with your JSON tidying, you can
-use [dplyr](http://github.com/hadley/dplyr) to continue manipulating the
-resulting data at your leisure!
+-   Create pipelines with `%>%`, producing code that can be read from
+    left to right
+
+-   Guarantee the structure of the data produced, even if the input JSON
+    structure changes (with the exception of `spread_all`)
+
+-   Work with arbitrarily nested arrays or objects
+
+-   Handle ‘ragged’ arrays and / or objects (varying lengths by
+    document)
+
+-   Allow for extraction of data in values or object names
+
+-   Ensure edge cases are handled correctly (especially empty data)
+
+-   Integrate seamlessly with `dplyr`, allowing `tbl_json` objects to
+    pipe in and out of `dplyr` verbs where reasonable
+
+Related Work
+------------
+
+Tidyjson depends upon
+
+-   [magrritr](https://github.com/smbache/magrittr) for the `%>%` pipe
+    operator
+-   [jsonlite](https://github.com/jeroenooms/jsonlite) for converting
+    JSON strings into nested lists
+-   [purrr](https://github.com/hadley/purrr) for list operators
+-   [tidyr](https://github.com/hadley/tidyr) for unnesting and spreading
+
+Further, there are other R packages that can be used to better
+understand JSON data
+
+-   [listviewer](https://github.com/timelyportfolio/listviewer) for
+    viewing JSON data interactively

@@ -1,57 +1,66 @@
-#' Add a column that tells the 'type' of the data in the root of the JSON
+#' Add a column that tells the 'type' of the JSON data
 #'
-#' The function json_types() inspects the JSON associated with 
-#' each row of the tbl_json data.frame, and adds a new column ("type" by 
-#' default) that identifies the type according to the 
-#' JSON standard at http://json.org/.
+#' The function \code{json_types} inspects the JSON associated with
+#' each row of the \code{\link{tbl_json}} object, and adds a new column
+#' (\code{"type"} by default) that identifies the type according to the
+#' JSON standard at \url{http://json.org/}.
 #'
-#' This is particularly useful for inspecting your JSON data types, and can added
-#' after gather_array() (or gather_keys()) to inspect the types of the elements
-#' (or values) in arrays (or objects).
+#' This is particularly useful for inspecting your JSON data types, and can
+#' often follows after \code{\link{gather_array}}, \code{\link{gather_object}}
+#' or \code{\link{enter_object}} to inspect the types of the elements of
+#' JSON objects or arrays.
 #'
-#' @param x a tbl_json object
+#' @param .x a json string or tbl_json object
 #' @param column.name the name to specify for the type column
-#' @return a tbl_json object with column.name column that tells the type
+#' @return a \code{\link{tbl_json}} object
 #' @export
-#' @examples 
-#' library(magrittr)  # for %>%
+#' @examples
+#'
+#' # A simple example
 #' c('{"a": 1}', '[1, 2]', '"a"', '1', 'true', 'null') %>% json_types
-json_types <- function(x, column.name = "type") {
-  
-  if (!is.tbl_json(x)) x <- as.tbl_json(x)
-  
-  # Extract json 
-  json <- attr(x, "JSON")
-  
+#'
+#' # Type distribution in the first 10 companies
+#' library(dplyr)
+#' companies[1:10] %>% gather_object %>% json_types %>% count(type)
+json_types <- function(.x, column.name = "type") {
+
+  if (!is.tbl_json(.x)) .x <- as.tbl_json(.x)
+
+  # Extract json
+  json <- attr(.x, "JSON")
+
   # Determine types
   types <- determine_types(json)
-  
+
   # Add as a column to x
-  x[column.name] <- types
-  
-  tbl_json(x, json)
-  
+  .x[column.name] <- types
+
+  tbl_json(.x, json)
+
 }
 
 #' Fundamental JSON types from http://json.org/, where I collapse 'true' and
 #' 'false' into 'logical'
-allowed_json_types <- 
+allowed_json_types <-
   c("object", "array", "string", "number", "logical", "null")
 
 #' Determines the types of a list of parsed JSON
 #' @param json_list a list of parsed JSON
 #' @return a factor with levels json_types
 determine_types <- function(json_list) {
-  
+
   # Get classes
-  classes <- vapply(json_list, class, character(1))
-  
+  classes <- purrr::map_chr(json_list, class)
+
   # Check existence of names
-  names <- vapply(json_list, function(x) !is.null(attr(x, "names")), logical(1))
-  
+  names <- purrr::map_lgl(json_list, function(x) !is.null(attr(x, "names")))
+
+  # Check if it's a list
+  is_list <- classes == "list"
+
   # Fix class names
-  classes[classes == "list" & names] <- "object"
-  classes[classes == "list" & !names] <- "array"
+  classes[is_list & names] <- "object"
+  classes[is_list & !names] <- "array"
   classes[classes == "character"] <- "string"
   classes[classes == "integer"] <- "number"
   classes[classes == "numeric"] <- "number"
@@ -59,5 +68,5 @@ determine_types <- function(json_list) {
 
   # Turn into a factor
   factor(classes, levels = allowed_json_types)
-  
+
 }

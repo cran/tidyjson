@@ -1,40 +1,38 @@
 #' Startup company information for 1,000 companies
 #'
 #' From: http://jsonstudio.com/resources/
-#' 
+#'
 #' @docType data
 #' @name companies
 #' @usage companies
 #' @format JSON
 #' @examples
-#' 
+#'
 #' library(dplyr)
-#' library(jsonlite)
-#' 
-#' # Print the first record (do not run automatically)
-#' # companies[[1]] %>% prettify
-#' 
-#' # Get the key employees data
-#' key_employees <- companies %>%
-#'   spread_values(
-#'     name = jstring("name")
-#'   ) %>% 
-#'   mutate(
-#'     company.sort_order = rank(name)
-#'   ) %>%
-#'   enter_object("relationships") %>%
-#'   gather_array("relationship.index") %>%
-#'   spread_values(
-#'     is.past = jlogical("is_past"),
-#'     name = jstring("person", "permalink"),
-#'     title = jstring("title")
-#'   )
-#' 
+#'
+#' # Companies is a long character vector
+#' companies %>% str
+#'
+#' # Work with a small sample
+#' co_samp <- companies[1:5]
+#'
+#' # Gather top level values and glimpse
+#' co_samp %>% spread_all %>% glimpse
+#'
+#' # Get the key employees data for the first 100 companies
+#' key_employees <- companies[1:100] %>%
+#'   spread_all %>%
+#'   select(name) %>%
+#'   enter_object(relationships) %>%
+#'   gather_array() %>%
+#'   spread_all
+#'
+#' key_employees %>% glimpse
+#'
 #' # Show the top 10 titles
 #' key_employees %>%
-#'   filter(!is.past) %>%
-#'   group_by(title) %>%
-#'   tally() %>%
+#'   filter(!is_past) %>%
+#'   count(title) %>%
 #'   arrange(desc(n)) %>%
 #'   top_n(10)
 NULL

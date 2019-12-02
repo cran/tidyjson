@@ -1,0 +1,429 @@
+---
+title: "Visualizing JSON schema"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Visualizing JSON schema}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r, echo = FALSE, message = FALSE}
+knitr::opts_chunk$set(collapse = T, comment = "#>")
+knitr::opts_chunk$set(fig.width = 7, fig.height = 5)
+options(tibble.print_min = 4L, tibble.print_max = 4L)
+```
+
+JSON is a very simple data standard that, through nested data structures, can
+represent incredibly complex datasets. In some cases, a set of JSON data
+closely corresponds to a table in a SQL database. However, more commonly a
+JSON document more closely maps to an entire SQL database.
+
+Understanding the structure of your JSON data is critical before you begin
+analyzing the data. In this vignette, we use `tidyjson` to inspect the
+structure of JSON data and then create various visualizations to help
+understand a complex JSON dataset.
+
+## JSON Definition
+
+For a refrehser on JSON, see the [JSON specification](http://www.json.org/), 
+which is a very concise summary of how JSON is formatted. In essence, there are
+three types of JSON data structures.
+
+Per the specification, an object is a name/value pair, like 
+`'{"string": "value"}'`:
+
+![](http://www.json.org/object.gif)
+
+An array is an ordered list, like `'[1, 2, 3]'`:
+
+![](http://www.json.org/array.gif)
+
+A value is a string, number, logical or NULL scalar:
+
+![](http://www.json.org/value.gif)
+
+What is particularly interesting about JSON is the following:
+
+* Documents can omit objects, and so no single document is representative of
+the schema of a collection
+* Objects and arrays can be deeply nested, it is not uncommon to have an 
+object with arrays of objects with arrays of objects of values
+* The system generating JSON can change over time, and so older documents can
+have different implicit schemas from newer documents
+
+All of this makes visualizing JSON data structures very useful when embarking
+on an analysis.
+
+## Load required libraries
+
+Before we start, let's load `tidyjson` along with other data manipulation and
+visualization libraries, and set a seed so we get consistent results.
+
+```{r, message = FALSE}
+library(jsonlite)
+library(dplyr)
+library(purrr)
+library(magrittr)
+library(forcats)
+library(ggplot2)
+library(igraph)
+library(RColorBrewer)
+library(wordcloud)
+library(viridis)
+library(listviewer)
+library(tidyjson)
+
+set.seed(1)
+```
+
+## Companies Data
+
+Let's work with the `companies` dataset included in the `tidyjson` package, 
+originating at [jsonstudio](http://jsonstudio.com/resources). It is a 
+`r class(companies)` vector of `r length(companies) %>% format(big.mark = ',')` 
+JSON strings, each describing a startup company.
+
+We can start by finding out how complex each record is by using 
+`json_complexity`:
+
+```{r}
+co_length <- companies %>% json_complexity
+```
+
+Then we can visualize the distribution of company documents by complexity on a 
+log-scale:
+
+```{r}
+co_length %>%
+  ggplot(aes(complexity)) +
+    geom_density() +
+    scale_x_log10() +
+    annotation_logticks(side = 'b')
+```
+
+It appears that some companies have unlisted length less than 10, while others 
+are in the hundreds or even thousands. The median is 
+`r median(co_length$complexity)`.
+
+Let's pick an example that is particularly small to start with:
+
+```{r}
+co_examp_index <- which(co_length$complexity == 20L)[1]
+
+co_examp <- companies[co_examp_index]
+
+co_examp
+```
+
+Even for such a small example it's hard to understand the structure from the
+raw JSON. We can instead use `listviewer::jsonedit` to view it:
+
+```{r}
+co_examp %>% jsonedit(mode = "code")
+```
+
+## Working with many companies
+
+This is great for understanding a single JSON document. But many of the objects
+are empty arrays, and so give us very little insight into the structure of
+the collection as a whole.
+
+To start working with the entire collection, let's use the `json_structure`
+function in tidyjson which gives us a `data.frame` where each row corresponds 
+to an object, array or scalar in the JSON document.
+
+```{r}
+co_struct <- companies %>% sample(5) %>% json_structure
+
+print(co_struct)
+```
+
+We can then aggregate all of the object names across the entire collection, 
+excluding `null` values to count the number of documents with meaningful data 
+under each object name.
+
+```{r}
+co_names <- co_struct %>% 
+  filter(type != "null" & !is.na(name)) %>%
+  group_by(level, name, type) %>%
+  summarize(ndoc = n_distinct(document.id))
+
+co_names
+```
+
+We can get a quick overview of the most common names using a `wordcloud`.
+
+```{r}
+co_names %$% wordcloud(name, ndoc, scale = c(1.5, .1), min.freq = 100)
+```
+
+Alternatively, we can visualize all the names in ggplot2.
+
+```{r, fig.height = 9}
+co_names %>%
+  ungroup %>%
+  group_by(type) %>%
+  arrange(desc(ndoc), level) %>%
+  mutate(rank = 1:n()) %>%
+  ggplot(aes(1, rank)) +
+    geom_text(aes(label = name, color = ndoc)) +
+    scale_y_reverse() +
+    facet_grid(. ~ type) +
+    theme_void() +
+    theme(legend.position = "bottom") +
+    scale_color_viridis(direction = -1)
+```
+
+This shows there are many comon strings and arrays, and many uncommon 
+objects, strings and numbers in the documents.
+
+## Visualizing as Graphs
+
+To really understand the structure of a document, we need to visaulize it as
+a graph. Let's define a `plot_json_graph` function to use `igraph` to visualize
+our JSON documents
+
+```{r}
+# Plots an igraph visualization of a JSON document
+#
+# @param .x a JSON string or tbl_json object
+# @param legend add a type color legend automatically
+# @param vertex.size the size of the vertices
+# @param edge.color the color for the edges
+# @param edge.width the width of the edge lines
+# @param show.labels should object names be shown
+# @param plot should the plot be rendered?
+# @param ... further arguments to igraph::plot.igraph
+plot_json_graph <- function(.x, legend = TRUE, vertex.size = 6,
+                            edge.color = 'grey70', edge.width = .5,
+                            show.labels = TRUE, plot = TRUE,
+                            ...) {
+
+  if (!is.tbl_json(.x)) .x <- as.tbl_json(.x)
+
+  if (nrow(.x) != 1) stop("nrow(.x) not equal to 1")
+
+  structure <- .x %>% json_structure
+
+  type_colors <- RColorBrewer::brewer.pal(6, "Accent")
+
+  graph_edges <- structure %>%
+    filter(!is.na(parent.id)) %>%
+    select(parent.id, child.id)
+
+  graph_vertices <- structure %>%
+    transmute(child.id,
+              vertex.color = type_colors[as.integer(type)],
+              vertex.label = name)
+
+  if (!show.labels)
+    graph_vertices$vertex.label <- rep(NA_character_, nrow(graph_vertices))
+
+  g <- igraph::graph_from_data_frame(graph_edges, vertices = graph_vertices,
+                             directed = FALSE)
+
+  if (plot) {
+    op <- par(mar = c(0, 0, 0, 0))
+    plt <- igraph::plot.igraph(g,
+         vertex.color = igraph::V(g)$vertex.color,
+         vertex.size  = vertex.size,
+         vertex.label = igraph::V(g)$vertex.label,
+         vertex.frame.color = NA,
+         layout = layout_with_kk,
+         edge.color = edge.color,
+         edge.width = edge.width,
+         ...)
+
+    if (legend)
+      legend(x = -1.3, y = -.6, levels(structure$type), pch = 21,
+             col= "white", pt.bg = type_colors,
+             pt.cex = 2, cex = .8, bty = "n", ncol = 1)
+
+    par(op)
+  }
+
+  invisible(g)
+
+}
+```
+
+Let's use the `plot_json_graph` function to look at our simple example:
+
+```{r}
+'{"object" : {"name": 1},
+  "array"  : ["a", "b"],
+  "string" : "value", 
+  "number" : 1, 
+  "logical": true,
+  "null"   : null}' %>% 
+  plot_json_graph
+```
+
+`plot_json_graph` produces a graph where every node in the JSON document appears
+as a vertex, and parent nodes are connected to children through edges. The color
+is coded to indicate what type each node is, and vertices are labeled based on
+the name (for objects) used to identify the node.
+
+Now let's look at a real company example:
+
+```{r}
+co_examp %>% plot_json_graph
+```
+
+For this company, almost all of the data is in the top level object.
+
+Now, let's create a function that plots a panel of these graphs:
+
+```{r, fig.height = 8}
+plot_json_graph_panel <- function(json, nrow, ncol, ...) {
+  
+  # Set up grid
+  op <- par(mfrow = c(nrow, ncol))
+  
+  indices <- seq_along(json) %>% keep(`<=`, nrow * ncol)
+  
+  for (i in indices) {
+    plot_json_graph(json[[i]], ...)
+    if ("names" %in% names(attributes(json))) 
+      title(names(json)[i], col.main = 'red')
+  }
+  
+  par(op)
+  invisible(NULL)
+}
+```
+
+And let's look at several simultaneously:
+
+```{r, fig.height = 8}
+plot_json_graph_panel(companies %>% sample(5), 7, 6, legend = FALSE, show.labels = FALSE,
+                      vertex.size = 4)
+```
+
+Clearly there is a huge amount of variety in the JSON documents!
+
+Let's look at the most complex example:
+
+```{r}
+most_complex <- companies[which(co_length$complexity == max(co_length$complexity))]
+
+most_complex_name <- most_complex %>% 
+  spread_values(name = jstring(name)) %>% 
+  extract2("name")
+``` 
+
+The most complex company is `r most_complex_name`! Let's try to plot it:
+
+```{r}
+plot_json_graph(most_complex, show.labels = FALSE, vertex.size = 2)
+```
+
+That is just too big. There are many arrays of complex objects that are
+repetitive in structure. Instead, we can simplify the structure by using
+`json_schema`.
+
+```{r}
+most_complex %>% json_schema %>% jsonedit(mode = "code")
+```
+
+We can visualize this as a graph, and get more meaningful coloring of the
+terminal nodes by instructing `json_schema` to use `type = "value"`.
+
+```{r}
+most_complex %>% json_schema(type = "value") %>% plot_json_graph
+```
+
+This is overwhelmed by top level scalar objects. We can visualize the
+more complex objects only
+
+```{r}
+most_complex %>% gather_object %>% json_types %>% json_complexity %>%
+  filter(type %in% c('array', 'object') & complexity >= 15) %>%
+  split(.$name) %>%
+  map(json_schema, type = "value") %>%
+  plot_json_graph_panel(3, 3, legend = FALSE)
+```
+
+## Working with funding data
+
+Now let's use this insight to structure funding and geo data for a visualization.
+
+First, let's get funding round data:
+
+```{r}
+rounds <- companies %>%
+  enter_object(funding_rounds) %>%
+  gather_array %>%
+  spread_values(
+    round = jstring(round_code),
+    currency = jstring(raised_currency_code),
+    raised = jnumber(raised_amount)
+  )
+rounds %>% head
+```
+
+Now, let's get geo data:
+
+```{r}
+geos <- companies %>%
+  enter_object(offices) %>%
+  gather_array %>%
+  spread_values(
+    country = jstring(country_code),
+    state = jstring(state_code),
+    description = jstring(description)
+  )
+geos %>% head
+```
+
+Now, let's join together the data for the US companies, assuming that the
+first office in the array is the headquarters (seems reasonable from a quick
+visual inspection of `geos`).
+
+```{r}
+hqs <- geos %>%
+  filter(array.index == 1) %>%
+  filter(country == "USA") %>%
+  select(document.id, state)
+  
+rounds_usd <- rounds %>%
+  filter(currency == "USD") %>%
+  filter(!is.na(raised)) %>%
+  select(document.id, round, raised)
+
+rounds_by_geo <- inner_join(rounds_usd, hqs, by = "document.id") %>% as_tibble()
+```
+
+Now we can visualize the results
+
+```{r}
+round_prep <- rounds_by_geo %>% 
+  dplyr::filter(!is.na(state)) %>%
+  mutate(
+    round = round %>% forcats::fct_collapse(
+      "angel" = c("seed", "angel"),
+      "d-f"   = c("d", "e", "f"),
+      "other" = c("grant", "partial", "post_ipo_equity", "private_equity", 
+                  "debt_round", "unattributed")
+    ) %>% forcats::fct_relevel("angel", "a", "b", "c", "d-f", "other")
+  ) %>%
+  mutate(
+    state = state %>% forcats::fct_lump(2)
+  ) 
+
+g <- ggplot(round_prep, aes(state, raised, fill = state)) +
+  geom_violin() +
+  scale_y_log10() + 
+  annotation_logticks(side = 'l') +
+  facet_grid(. ~ round) +
+  theme(legend.position = "bottom") +
+  labs(x = "", y = "Amount Raised (USD)")
+```
+
+Which shows a few interesting things:
+
+* Round sizes don't increase dramatically from b through f
+* Variance is much higher in angel and a rounds (and other)
+* NY and other US states have similar distributions with the exception of d-f
+rounds, where CA seems higher than NY
