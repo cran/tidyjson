@@ -7,14 +7,11 @@
 \alias{append_values_logical}
 \title{Appends all JSON values with a specified type as a new column}
 \usage{
-append_values_string(.x, column.name = type, force = TRUE,
-  recursive = FALSE)
+append_values_string(.x, column.name = type, force = TRUE, recursive = FALSE)
 
-append_values_number(.x, column.name = type, force = TRUE,
-  recursive = FALSE)
+append_values_number(.x, column.name = type, force = TRUE, recursive = FALSE)
 
-append_values_logical(.x, column.name = type, force = TRUE,
-  recursive = FALSE)
+append_values_logical(.x, column.name = type, force = TRUE, recursive = FALSE)
 }
 \arguments{
 \item{.x}{a json string or \code{\link{tbl_json}} object}
@@ -66,5 +63,6 @@ recipes \%>\%
 }
 \seealso{
 \code{\link{gather_object}} to gather an object first,
-   \code{\link{spread_all}} to spread values into new columns
+   \code{\link{spread_all}} to spread values into new columns,
+   \code{\link{json_get_column}}
 }

@@ -4,11 +4,14 @@
 \alias{wrap_dplyr_verb}
 \title{Wrapper for extending dplyr verbs to tbl_json objects}
 \usage{
-wrap_dplyr_verb(dplyr.verb)
+wrap_dplyr_verb(dplyr.verb, generic)
 }
 \arguments{
 \item{dplyr.verb}{a dplyr::verb such as filter, arrange}
+
+\item{generic}{character. The name of the generic}
 }
 \description{
 Wrapper for extending dplyr verbs to tbl_json objects
 }
+\keyword{internal}

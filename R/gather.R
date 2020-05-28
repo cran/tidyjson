@@ -7,6 +7,7 @@
 #'   in the tbl_df
 #' @param required.type the json_types type that must be present in every
 #'   element of the JSON for this to succeed
+#' @keywords internal
 gather_factory <- function(default.column.name, default.column.empty,
                            expand.fun, required.type) {
 
@@ -18,7 +19,7 @@ gather_factory <- function(default.column.name, default.column.empty,
     if (!is.tbl_json(.x)) .x <- as.tbl_json(.x)
 
     # Get JSON
-    json <- attr(.x, "JSON")
+    json <- json_get(.x)
 
     # Handle the case where json is just an empty list
     if (identical(json, list())) {

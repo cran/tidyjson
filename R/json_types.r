@@ -27,7 +27,7 @@ json_types <- function(.x, column.name = "type") {
   if (!is.tbl_json(.x)) .x <- as.tbl_json(.x)
 
   # Extract json
-  json <- attr(.x, "JSON")
+  json <- json_get(.x)
 
   # Determine types
   types <- determine_types(json)
@@ -47,6 +47,7 @@ allowed_json_types <-
 #' Determines the types of a list of parsed JSON
 #' @param json_list a list of parsed JSON
 #' @return a factor with levels json_types
+#' @keywords internal
 determine_types <- function(json_list) {
 
   # Get classes

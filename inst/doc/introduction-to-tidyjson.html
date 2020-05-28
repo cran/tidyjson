@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 
-<meta name="date" content="2019-11-28" />
+<meta name="date" content="2020-05-28" />
 
 <title>Introduction to tidyjson</title>
 
@@ -20,9 +19,9 @@
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css" data-origin="pandoc">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
 div.sourceCode { margin: 1em 0; }
@@ -32,14 +31,16 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -48,9 +49,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -117,9 +118,6 @@ padding-right: 2em;
 font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 font-size: 14px;
 line-height: 1.35;
-}
-#header {
-text-align: center;
 }
 #TOC {
 clear: both;
@@ -288,7 +286,8 @@ code > span.st { color: #d14; }
 code > span.co { color: #888888; font-style: italic; } 
 code > span.ot { color: #007020; } 
 code > span.al { color: #ff0000; font-weight: bold; } 
-code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
 </style>
 
 
@@ -302,7 +301,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 
 <h1 class="title toc-ignore">Introduction to tidyjson</h1>
-<h4 class="date">2019-11-28</h4>
+<h4 class="date">2020-05-28</h4>
 
 
 
@@ -332,109 +331,109 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <div id="a-simple-example" class="section level2">
 <h2>A simple example</h2>
 <p>A simple example of how tidyjson works is as follows:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(dplyr)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="co"># Define a simple people JSON collection</span></a>
-<a class="sourceLine" id="cb1-4" data-line-number="4">people &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">'{&quot;age&quot;: 32, &quot;name&quot;: {&quot;first&quot;: &quot;Bob&quot;,   &quot;last&quot;: &quot;Smith&quot;}}'</span>,</a>
-<a class="sourceLine" id="cb1-5" data-line-number="5">            <span class="st">'{&quot;age&quot;: 54, &quot;name&quot;: {&quot;first&quot;: &quot;Susan&quot;, &quot;last&quot;: &quot;Doe&quot;}}'</span>,</a>
-<a class="sourceLine" id="cb1-6" data-line-number="6">            <span class="st">'{&quot;age&quot;: 18, &quot;name&quot;: {&quot;first&quot;: &quot;Ann&quot;,   &quot;last&quot;: &quot;Jones&quot;}}'</span>)</a>
-<a class="sourceLine" id="cb1-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb1-8" data-line-number="8"><span class="co"># Tidy the JSON data</span></a>
-<a class="sourceLine" id="cb1-9" data-line-number="9">people <span class="op">%&gt;%</span><span class="st"> </span>spread_all</a>
-<a class="sourceLine" id="cb1-10" data-line-number="10"><span class="co">#&gt; # A tbl_json: 3 x 4 tibble with a &quot;JSON&quot; attribute</span></a>
-<a class="sourceLine" id="cb1-11" data-line-number="11"><span class="co">#&gt;   `attr(., &quot;JSON&quot;)`       document.id   age name.first name.last</span></a>
-<a class="sourceLine" id="cb1-12" data-line-number="12"><span class="co">#&gt;   &lt;chr&gt;                         &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;    </span></a>
-<a class="sourceLine" id="cb1-13" data-line-number="13"><span class="co">#&gt; 1 &quot;{\&quot;age\&quot;:32,\&quot;name...&quot;           1    32 Bob        Smith    </span></a>
-<a class="sourceLine" id="cb1-14" data-line-number="14"><span class="co">#&gt; 2 &quot;{\&quot;age\&quot;:54,\&quot;name...&quot;           2    54 Susan      Doe      </span></a>
-<a class="sourceLine" id="cb1-15" data-line-number="15"><span class="co">#&gt; 3 &quot;{\&quot;age\&quot;:18,\&quot;name...&quot;           3    18 Ann        Jones</span></a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(dplyr)</span>
+<span id="cb1-2"><a href="#cb1-2"></a></span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="co"># Define a simple people JSON collection</span></span>
+<span id="cb1-4"><a href="#cb1-4"></a>people &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;{&quot;age&quot;: 32, &quot;name&quot;: {&quot;first&quot;: &quot;Bob&quot;,   &quot;last&quot;: &quot;Smith&quot;}}&#39;</span>,</span>
+<span id="cb1-5"><a href="#cb1-5"></a>            <span class="st">&#39;{&quot;age&quot;: 54, &quot;name&quot;: {&quot;first&quot;: &quot;Susan&quot;, &quot;last&quot;: &quot;Doe&quot;}}&#39;</span>,</span>
+<span id="cb1-6"><a href="#cb1-6"></a>            <span class="st">&#39;{&quot;age&quot;: 18, &quot;name&quot;: {&quot;first&quot;: &quot;Ann&quot;,   &quot;last&quot;: &quot;Jones&quot;}}&#39;</span>)</span>
+<span id="cb1-7"><a href="#cb1-7"></a></span>
+<span id="cb1-8"><a href="#cb1-8"></a><span class="co"># Tidy the JSON data</span></span>
+<span id="cb1-9"><a href="#cb1-9"></a>people <span class="op">%&gt;%</span><span class="st"> </span>spread_all</span>
+<span id="cb1-10"><a href="#cb1-10"></a><span class="co">#&gt; # A tbl_json: 3 x 5 tibble with a &quot;JSON&quot; attribute</span></span>
+<span id="cb1-11"><a href="#cb1-11"></a><span class="co">#&gt;   ..JSON                  document.id   age name.first name.last</span></span>
+<span id="cb1-12"><a href="#cb1-12"></a><span class="co">#&gt;   &lt;chr&gt;                         &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;    </span></span>
+<span id="cb1-13"><a href="#cb1-13"></a><span class="co">#&gt; 1 &quot;{\&quot;age\&quot;:32,\&quot;name...&quot;           1    32 Bob        Smith    </span></span>
+<span id="cb1-14"><a href="#cb1-14"></a><span class="co">#&gt; 2 &quot;{\&quot;age\&quot;:54,\&quot;name...&quot;           2    54 Susan      Doe      </span></span>
+<span id="cb1-15"><a href="#cb1-15"></a><span class="co">#&gt; 3 &quot;{\&quot;age\&quot;:18,\&quot;name...&quot;           3    18 Ann        Jones</span></span></code></pre></div>
 <p>This produces a <code>tbl_json</code> object, where each row corresponds to an element of the <code>people</code> vector (a “document” in tidyjson). The JSON attribute of the <code>tbl_json</code> object is shown first, then the columns of the tibble are shown - a <code>document.id</code> indicating which document the row originated in, and then the age and name columns that <code>spread_all</code> created.</p>
 </div>
 <div id="a-more-complex-example" class="section level2">
 <h2>A more complex example</h2>
 <p>The tidyjson package really shines in a more complex example. Consider the <code>worldbank</code> data included in the tidyjson package.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">worldbank <span class="op">%&gt;%</span><span class="st"> </span>str</a>
-<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="co">#&gt;  chr [1:500] &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:\&quot;52b213b38594d8a2be17c780\&quot;},\&quot;boardapprovaldate\&quot;:\&quot;2013-11-12T00:00:00Z\&quot;,\&quot;closingdate\&quot;&quot;| __truncated__ ...</span></a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>worldbank <span class="op">%&gt;%</span><span class="st"> </span>str</span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="co">#&gt;  chr [1:500] &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:\&quot;52b213b38594d8a2be17c780\&quot;},\&quot;boardapprovaldate\&quot;:\&quot;2013-11-12T00:00:00Z\&quot;,\&quot;closingdate\&quot;&quot;| __truncated__ ...</span></span></code></pre></div>
 <p>It is a 500 length character vector of projects funded by the world bank. We can quickly expand all simple columns using <code>spread_all</code></p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">worldbank <span class="op">%&gt;%</span><span class="st"> </span>spread_all</a>
-<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="co">#&gt; # A tbl_json: 500 x 8 tibble with a &quot;JSON&quot; attribute</span></a>
-<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="co">#&gt;   `attr(., &quot;JSON&quot;… document.id boardapprovalda… closingdate</span></a>
-<a class="sourceLine" id="cb3-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt;                  &lt;int&gt; &lt;chr&gt;            &lt;chr&gt;      </span></a>
-<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="co">#&gt; 1 &quot;{\&quot;_id\&quot;:{\&quot;$o…           1 2013-11-12T00:0… 2018-07-07…</span></a>
-<a class="sourceLine" id="cb3-6" data-line-number="6"><span class="co">#&gt; 2 &quot;{\&quot;_id\&quot;:{\&quot;$o…           2 2013-11-04T00:0… &lt;NA&gt;       </span></a>
-<a class="sourceLine" id="cb3-7" data-line-number="7"><span class="co">#&gt; 3 &quot;{\&quot;_id\&quot;:{\&quot;$o…           3 2013-11-01T00:0… &lt;NA&gt;       </span></a>
-<a class="sourceLine" id="cb3-8" data-line-number="8"><span class="co">#&gt; 4 &quot;{\&quot;_id\&quot;:{\&quot;$o…           4 2013-10-31T00:0… &lt;NA&gt;       </span></a>
-<a class="sourceLine" id="cb3-9" data-line-number="9"><span class="co">#&gt; # … with 496 more rows, and 5 more variables: countryshortname &lt;chr&gt;,</span></a>
-<a class="sourceLine" id="cb3-10" data-line-number="10"><span class="co">#&gt; #   project_name &lt;chr&gt;, regionname &lt;chr&gt;, totalamt &lt;dbl&gt;, `_id.$oid` &lt;chr&gt;</span></a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>worldbank <span class="op">%&gt;%</span><span class="st"> </span>spread_all</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="co">#&gt; # A tbl_json: 500 x 9 tibble with a &quot;JSON&quot; attribute</span></span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="co">#&gt;   ..JSON document.id boardapprovalda… closingdate countryshortname project_name</span></span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="co">#&gt;   &lt;chr&gt;        &lt;int&gt; &lt;chr&gt;            &lt;chr&gt;       &lt;chr&gt;            &lt;chr&gt;       </span></span>
+<span id="cb3-5"><a href="#cb3-5"></a><span class="co">#&gt; 1 &quot;{\&quot;_…           1 2013-11-12T00:0… 2018-07-07… Ethiopia         Ethiopia Ge…</span></span>
+<span id="cb3-6"><a href="#cb3-6"></a><span class="co">#&gt; 2 &quot;{\&quot;_…           2 2013-11-04T00:0… &lt;NA&gt;        Tunisia          TN: DTF Soc…</span></span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="co">#&gt; 3 &quot;{\&quot;_…           3 2013-11-01T00:0… &lt;NA&gt;        Tuvalu           Tuvalu Avia…</span></span>
+<span id="cb3-8"><a href="#cb3-8"></a><span class="co">#&gt; 4 &quot;{\&quot;_…           4 2013-10-31T00:0… &lt;NA&gt;        Yemen, Republic… Gov&#39;t and C…</span></span>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="co">#&gt; # … with 496 more rows, and 3 more variables: regionname &lt;chr&gt;, totalamt &lt;dbl&gt;,</span></span>
+<span id="cb3-10"><a href="#cb3-10"></a><span class="co">#&gt; #   `_id.$oid` &lt;chr&gt;</span></span></code></pre></div>
 <p>And we can limit the coluns produced by calling <code>dplyr::select</code> after</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">worldbank <span class="op">%&gt;%</span><span class="st"> </span>spread_all <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(regionname, totalamt)</a>
-<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="co">#&gt; # A tbl_json: 500 x 2 tibble with a &quot;JSON&quot; attribute</span></a>
-<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#&gt;   `attr(., &quot;JSON&quot;)`        regionname                    totalamt</span></a>
-<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt;                    &lt;chr&gt;                            &lt;dbl&gt;</span></a>
-<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co">#&gt; 1 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot; Africa                       130000000</span></a>
-<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt; 2 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot; Middle East and North Africa         0</span></a>
-<a class="sourceLine" id="cb4-7" data-line-number="7"><span class="co">#&gt; 3 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot; East Asia and Pacific          6060000</span></a>
-<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="co">#&gt; 4 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot; Middle East and North Africa         0</span></a>
-<a class="sourceLine" id="cb4-9" data-line-number="9"><span class="co">#&gt; # … with 496 more rows</span></a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>worldbank <span class="op">%&gt;%</span><span class="st"> </span>spread_all <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(regionname, totalamt)</span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="co">#&gt; # A tbl_json: 500 x 3 tibble with a &quot;JSON&quot; attribute</span></span>
+<span id="cb4-3"><a href="#cb4-3"></a><span class="co">#&gt;   ..JSON                   regionname                    totalamt</span></span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="co">#&gt;   &lt;chr&gt;                    &lt;chr&gt;                            &lt;dbl&gt;</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a><span class="co">#&gt; 1 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot; Africa                       130000000</span></span>
+<span id="cb4-6"><a href="#cb4-6"></a><span class="co">#&gt; 2 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot; Middle East and North Africa         0</span></span>
+<span id="cb4-7"><a href="#cb4-7"></a><span class="co">#&gt; 3 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot; East Asia and Pacific          6060000</span></span>
+<span id="cb4-8"><a href="#cb4-8"></a><span class="co">#&gt; 4 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot; Middle East and North Africa         0</span></span>
+<span id="cb4-9"><a href="#cb4-9"></a><span class="co">#&gt; # … with 496 more rows</span></span></code></pre></div>
 <p>But worldbank also contains arrays, which cannot be naively spread into new columns. We can use <code>gather_object</code> to gather all name-value paris by name, and then <code>json_types</code> to identify the type of JSON stored under each value, and <code>dplyr::count</code> to aggregate across documents:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">worldbank <span class="op">%&gt;%</span><span class="st"> </span>gather_object <span class="op">%&gt;%</span><span class="st"> </span>json_types <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">count</span>(name, type)</a>
-<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="co">#&gt; # A tibble: 8 x 3</span></a>
-<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="co">#&gt;   name                type       n</span></a>
-<a class="sourceLine" id="cb5-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt;               &lt;fct&gt;  &lt;int&gt;</span></a>
-<a class="sourceLine" id="cb5-5" data-line-number="5"><span class="co">#&gt; 1 _id                 object   500</span></a>
-<a class="sourceLine" id="cb5-6" data-line-number="6"><span class="co">#&gt; 2 boardapprovaldate   string   500</span></a>
-<a class="sourceLine" id="cb5-7" data-line-number="7"><span class="co">#&gt; 3 closingdate         string   370</span></a>
-<a class="sourceLine" id="cb5-8" data-line-number="8"><span class="co">#&gt; 4 countryshortname    string   500</span></a>
-<a class="sourceLine" id="cb5-9" data-line-number="9"><span class="co">#&gt; 5 majorsector_percent array    500</span></a>
-<a class="sourceLine" id="cb5-10" data-line-number="10"><span class="co">#&gt; 6 project_name        string   500</span></a>
-<a class="sourceLine" id="cb5-11" data-line-number="11"><span class="co">#&gt; 7 regionname          string   500</span></a>
-<a class="sourceLine" id="cb5-12" data-line-number="12"><span class="co">#&gt; 8 totalamt            number   500</span></a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>worldbank <span class="op">%&gt;%</span><span class="st"> </span>gather_object <span class="op">%&gt;%</span><span class="st"> </span>json_types <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">count</span>(name, type)</span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="co">#&gt; # A tibble: 8 x 3</span></span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="co">#&gt;   name                type       n</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a><span class="co">#&gt;   &lt;chr&gt;               &lt;fct&gt;  &lt;int&gt;</span></span>
+<span id="cb5-5"><a href="#cb5-5"></a><span class="co">#&gt; 1 _id                 object   500</span></span>
+<span id="cb5-6"><a href="#cb5-6"></a><span class="co">#&gt; 2 boardapprovaldate   string   500</span></span>
+<span id="cb5-7"><a href="#cb5-7"></a><span class="co">#&gt; 3 closingdate         string   370</span></span>
+<span id="cb5-8"><a href="#cb5-8"></a><span class="co">#&gt; 4 countryshortname    string   500</span></span>
+<span id="cb5-9"><a href="#cb5-9"></a><span class="co">#&gt; 5 majorsector_percent array    500</span></span>
+<span id="cb5-10"><a href="#cb5-10"></a><span class="co">#&gt; 6 project_name        string   500</span></span>
+<span id="cb5-11"><a href="#cb5-11"></a><span class="co">#&gt; 7 regionname          string   500</span></span>
+<span id="cb5-12"><a href="#cb5-12"></a><span class="co">#&gt; 8 totalamt            number   500</span></span></code></pre></div>
 <p>It appears that <code>majorsector_percent</code> is an array, and so we can use <code>enter_object</code> to enter into it:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">worldbank <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">enter_object</span>(majorsector_percent)</a>
-<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="co">#&gt; # A tbl_json: 500 x 1 tibble with a &quot;JSON&quot; attribute</span></a>
-<a class="sourceLine" id="cb6-3" data-line-number="3"><span class="co">#&gt;   `attr(., &quot;JSON&quot;)`       document.id</span></a>
-<a class="sourceLine" id="cb6-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt;                         &lt;int&gt;</span></a>
-<a class="sourceLine" id="cb6-5" data-line-number="5"><span class="co">#&gt; 1 &quot;[{\&quot;Name\&quot;:\&quot;Educa...&quot;           1</span></a>
-<a class="sourceLine" id="cb6-6" data-line-number="6"><span class="co">#&gt; 2 &quot;[{\&quot;Name\&quot;:\&quot;Publi...&quot;           2</span></a>
-<a class="sourceLine" id="cb6-7" data-line-number="7"><span class="co">#&gt; 3 &quot;[{\&quot;Name\&quot;:\&quot;Trans...&quot;           3</span></a>
-<a class="sourceLine" id="cb6-8" data-line-number="8"><span class="co">#&gt; 4 &quot;[{\&quot;Name\&quot;:\&quot;Healt...&quot;           4</span></a>
-<a class="sourceLine" id="cb6-9" data-line-number="9"><span class="co">#&gt; # … with 496 more rows</span></a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>worldbank <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">enter_object</span>(majorsector_percent)</span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="co">#&gt; # A tbl_json: 500 x 2 tibble with a &quot;JSON&quot; attribute</span></span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="co">#&gt;   ..JSON                  document.id</span></span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="co">#&gt;   &lt;chr&gt;                         &lt;int&gt;</span></span>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="co">#&gt; 1 &quot;[{\&quot;Name\&quot;:\&quot;Educa...&quot;           1</span></span>
+<span id="cb6-6"><a href="#cb6-6"></a><span class="co">#&gt; 2 &quot;[{\&quot;Name\&quot;:\&quot;Publi...&quot;           2</span></span>
+<span id="cb6-7"><a href="#cb6-7"></a><span class="co">#&gt; 3 &quot;[{\&quot;Name\&quot;:\&quot;Trans...&quot;           3</span></span>
+<span id="cb6-8"><a href="#cb6-8"></a><span class="co">#&gt; 4 &quot;[{\&quot;Name\&quot;:\&quot;Healt...&quot;           4</span></span>
+<span id="cb6-9"><a href="#cb6-9"></a><span class="co">#&gt; # … with 496 more rows</span></span></code></pre></div>
 <p>and <code>gather_array</code> to gather it by index</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">worldbank <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">enter_object</span>(majorsector_percent) <span class="op">%&gt;%</span><span class="st"> </span>gather_array</a>
-<a class="sourceLine" id="cb7-2" data-line-number="2"><span class="co">#&gt; # A tbl_json: 1,405 x 2 tibble with a &quot;JSON&quot; attribute</span></a>
-<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="co">#&gt;   `attr(., &quot;JSON&quot;)`       document.id array.index</span></a>
-<a class="sourceLine" id="cb7-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt;                         &lt;int&gt;       &lt;int&gt;</span></a>
-<a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co">#&gt; 1 &quot;{\&quot;Name\&quot;:\&quot;Educat...&quot;           1           1</span></a>
-<a class="sourceLine" id="cb7-6" data-line-number="6"><span class="co">#&gt; 2 &quot;{\&quot;Name\&quot;:\&quot;Educat...&quot;           1           2</span></a>
-<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="co">#&gt; 3 &quot;{\&quot;Name\&quot;:\&quot;Public...&quot;           1           3</span></a>
-<a class="sourceLine" id="cb7-8" data-line-number="8"><span class="co">#&gt; 4 &quot;{\&quot;Name\&quot;:\&quot;Educat...&quot;           1           4</span></a>
-<a class="sourceLine" id="cb7-9" data-line-number="9"><span class="co">#&gt; # … with 1,401 more rows</span></a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>worldbank <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">enter_object</span>(majorsector_percent) <span class="op">%&gt;%</span><span class="st"> </span>gather_array</span>
+<span id="cb7-2"><a href="#cb7-2"></a><span class="co">#&gt; # A tbl_json: 1,405 x 3 tibble with a &quot;JSON&quot; attribute</span></span>
+<span id="cb7-3"><a href="#cb7-3"></a><span class="co">#&gt;   ..JSON                  document.id array.index</span></span>
+<span id="cb7-4"><a href="#cb7-4"></a><span class="co">#&gt;   &lt;chr&gt;                         &lt;int&gt;       &lt;int&gt;</span></span>
+<span id="cb7-5"><a href="#cb7-5"></a><span class="co">#&gt; 1 &quot;{\&quot;Name\&quot;:\&quot;Educat...&quot;           1           1</span></span>
+<span id="cb7-6"><a href="#cb7-6"></a><span class="co">#&gt; 2 &quot;{\&quot;Name\&quot;:\&quot;Educat...&quot;           1           2</span></span>
+<span id="cb7-7"><a href="#cb7-7"></a><span class="co">#&gt; 3 &quot;{\&quot;Name\&quot;:\&quot;Public...&quot;           1           3</span></span>
+<span id="cb7-8"><a href="#cb7-8"></a><span class="co">#&gt; 4 &quot;{\&quot;Name\&quot;:\&quot;Educat...&quot;           1           4</span></span>
+<span id="cb7-9"><a href="#cb7-9"></a><span class="co">#&gt; # … with 1,401 more rows</span></span></code></pre></div>
 <p>We can then <code>spread_all</code> again to capture the name-value pairs stored in each object</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">worldbank <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb8-2" data-line-number="2"><span class="st">  </span><span class="kw">enter_object</span>(majorsector_percent) <span class="op">%&gt;%</span><span class="st"> </span>gather_array <span class="op">%&gt;%</span><span class="st"> </span>spread_all</a>
-<a class="sourceLine" id="cb8-3" data-line-number="3"><span class="co">#&gt; # A tbl_json: 1,405 x 4 tibble with a &quot;JSON&quot; attribute</span></a>
-<a class="sourceLine" id="cb8-4" data-line-number="4"><span class="co">#&gt;   `attr(., &quot;JSON&quot;)`    document.id array.index Name                 Percent</span></a>
-<a class="sourceLine" id="cb8-5" data-line-number="5"><span class="co">#&gt;   &lt;chr&gt;                      &lt;int&gt;       &lt;int&gt; &lt;chr&gt;                  &lt;dbl&gt;</span></a>
-<a class="sourceLine" id="cb8-6" data-line-number="6"><span class="co">#&gt; 1 &quot;{\&quot;Name\&quot;:\&quot;Educat…           1           1 Education                 46</span></a>
-<a class="sourceLine" id="cb8-7" data-line-number="7"><span class="co">#&gt; 2 &quot;{\&quot;Name\&quot;:\&quot;Educat…           1           2 Education                 26</span></a>
-<a class="sourceLine" id="cb8-8" data-line-number="8"><span class="co">#&gt; 3 &quot;{\&quot;Name\&quot;:\&quot;Public…           1           3 Public Administrati…      16</span></a>
-<a class="sourceLine" id="cb8-9" data-line-number="9"><span class="co">#&gt; 4 &quot;{\&quot;Name\&quot;:\&quot;Educat…           1           4 Education                 12</span></a>
-<a class="sourceLine" id="cb8-10" data-line-number="10"><span class="co">#&gt; # … with 1,401 more rows</span></a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>worldbank <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="st">  </span><span class="kw">enter_object</span>(majorsector_percent) <span class="op">%&gt;%</span><span class="st"> </span>gather_array <span class="op">%&gt;%</span><span class="st"> </span>spread_all</span>
+<span id="cb8-3"><a href="#cb8-3"></a><span class="co">#&gt; # A tbl_json: 1,405 x 5 tibble with a &quot;JSON&quot; attribute</span></span>
+<span id="cb8-4"><a href="#cb8-4"></a><span class="co">#&gt;   ..JSON             document.id array.index Name                        Percent</span></span>
+<span id="cb8-5"><a href="#cb8-5"></a><span class="co">#&gt;   &lt;chr&gt;                    &lt;int&gt;       &lt;int&gt; &lt;chr&gt;                         &lt;dbl&gt;</span></span>
+<span id="cb8-6"><a href="#cb8-6"></a><span class="co">#&gt; 1 &quot;{\&quot;Name\&quot;:\&quot;Educ…           1           1 Education                        46</span></span>
+<span id="cb8-7"><a href="#cb8-7"></a><span class="co">#&gt; 2 &quot;{\&quot;Name\&quot;:\&quot;Educ…           1           2 Education                        26</span></span>
+<span id="cb8-8"><a href="#cb8-8"></a><span class="co">#&gt; 3 &quot;{\&quot;Name\&quot;:\&quot;Publ…           1           3 Public Administration, Law…      16</span></span>
+<span id="cb8-9"><a href="#cb8-9"></a><span class="co">#&gt; 4 &quot;{\&quot;Name\&quot;:\&quot;Educ…           1           4 Education                        12</span></span>
+<span id="cb8-10"><a href="#cb8-10"></a><span class="co">#&gt; # … with 1,401 more rows</span></span></code></pre></div>
 <p>By combining with our initial top-level <code>spread_all</code>, we can aggregate funding dollars by sector by region:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">worldbank <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb9-2" data-line-number="2"><span class="st">  </span>spread_all <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="dt">region =</span> regionname, <span class="dt">funding =</span> totalamt) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb9-3" data-line-number="3"><span class="st">  </span><span class="kw">enter_object</span>(majorsector_percent) <span class="op">%&gt;%</span><span class="st"> </span>gather_array <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb9-4" data-line-number="4"><span class="st">  </span>spread_all <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">rename</span>(<span class="dt">sector =</span> Name, <span class="dt">percent =</span> Percent) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb9-5" data-line-number="5"><span class="st">  </span><span class="kw">group_by</span>(region, sector) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb9-6" data-line-number="6"><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">funding =</span> <span class="kw">sum</span>(funding <span class="op">*</span><span class="st"> </span>percent))</a>
-<a class="sourceLine" id="cb9-7" data-line-number="7"><span class="co">#&gt; # A tibble: 63 x 3</span></a>
-<a class="sourceLine" id="cb9-8" data-line-number="8"><span class="co">#&gt; # Groups:   region [7]</span></a>
-<a class="sourceLine" id="cb9-9" data-line-number="9"><span class="co">#&gt;   region sector                                 funding</span></a>
-<a class="sourceLine" id="cb9-10" data-line-number="10"><span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;                                    &lt;dbl&gt;</span></a>
-<a class="sourceLine" id="cb9-11" data-line-number="11"><span class="co">#&gt; 1 Africa Agriculture, fishing, and forestry 96648500000</span></a>
-<a class="sourceLine" id="cb9-12" data-line-number="12"><span class="co">#&gt; 2 Africa Education                          83370000000</span></a>
-<a class="sourceLine" id="cb9-13" data-line-number="13"><span class="co">#&gt; 3 Africa Energy and mining                  86709960000</span></a>
-<a class="sourceLine" id="cb9-14" data-line-number="14"><span class="co">#&gt; 4 Africa Finance                            30761000000</span></a>
-<a class="sourceLine" id="cb9-15" data-line-number="15"><span class="co">#&gt; # … with 59 more rows</span></a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>worldbank <span class="op">%&gt;%</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a><span class="st">  </span>spread_all <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="dt">region =</span> regionname, <span class="dt">funding =</span> totalamt) <span class="op">%&gt;%</span></span>
+<span id="cb9-3"><a href="#cb9-3"></a><span class="st">  </span><span class="kw">enter_object</span>(majorsector_percent) <span class="op">%&gt;%</span><span class="st"> </span>gather_array <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb9-4"><a href="#cb9-4"></a><span class="st">  </span>spread_all <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">rename</span>(<span class="dt">sector =</span> Name, <span class="dt">percent =</span> Percent) <span class="op">%&gt;%</span></span>
+<span id="cb9-5"><a href="#cb9-5"></a><span class="st">  </span><span class="kw">group_by</span>(region, sector) <span class="op">%&gt;%</span></span>
+<span id="cb9-6"><a href="#cb9-6"></a><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">funding =</span> <span class="kw">sum</span>(funding <span class="op">*</span><span class="st"> </span>percent))</span>
+<span id="cb9-7"><a href="#cb9-7"></a><span class="co">#&gt; # A tibble: 63 x 3</span></span>
+<span id="cb9-8"><a href="#cb9-8"></a><span class="co">#&gt; # Groups:   region [7]</span></span>
+<span id="cb9-9"><a href="#cb9-9"></a><span class="co">#&gt;   region sector                                 funding</span></span>
+<span id="cb9-10"><a href="#cb9-10"></a><span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;                                    &lt;dbl&gt;</span></span>
+<span id="cb9-11"><a href="#cb9-11"></a><span class="co">#&gt; 1 Africa Agriculture, fishing, and forestry 96648500000</span></span>
+<span id="cb9-12"><a href="#cb9-12"></a><span class="co">#&gt; 2 Africa Education                          83370000000</span></span>
+<span id="cb9-13"><a href="#cb9-13"></a><span class="co">#&gt; 3 Africa Energy and mining                  86709960000</span></span>
+<span id="cb9-14"><a href="#cb9-14"></a><span class="co">#&gt; 4 Africa Finance                            30761000000</span></span>
+<span id="cb9-15"><a href="#cb9-15"></a><span class="co">#&gt; # … with 59 more rows</span></span></code></pre></div>
 </div>
 <div id="tidyjson-functions" class="section level2">
 <h2>Tidyjson functions</h2>
@@ -517,80 +516,79 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <h3>Spread selected</h3>
 <p>Spread all object values and select a subset to continue working with.</p>
 <p><code>spread_all %&gt;% select</code></p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">worldbank <span class="op">%&gt;%</span><span class="st"> </span>spread_all <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(regionname, totalamt)</a>
-<a class="sourceLine" id="cb10-2" data-line-number="2"><span class="co">#&gt; # A tbl_json: 500 x 2 tibble with a &quot;JSON&quot; attribute</span></a>
-<a class="sourceLine" id="cb10-3" data-line-number="3"><span class="co">#&gt;   `attr(., &quot;JSON&quot;)`        regionname                    totalamt</span></a>
-<a class="sourceLine" id="cb10-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt;                    &lt;chr&gt;                            &lt;dbl&gt;</span></a>
-<a class="sourceLine" id="cb10-5" data-line-number="5"><span class="co">#&gt; 1 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot; Africa                       130000000</span></a>
-<a class="sourceLine" id="cb10-6" data-line-number="6"><span class="co">#&gt; 2 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot; Middle East and North Africa         0</span></a>
-<a class="sourceLine" id="cb10-7" data-line-number="7"><span class="co">#&gt; 3 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot; East Asia and Pacific          6060000</span></a>
-<a class="sourceLine" id="cb10-8" data-line-number="8"><span class="co">#&gt; 4 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot; Middle East and North Africa         0</span></a>
-<a class="sourceLine" id="cb10-9" data-line-number="9"><span class="co">#&gt; # … with 496 more rows</span></a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>worldbank <span class="op">%&gt;%</span><span class="st"> </span>spread_all <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(regionname, totalamt)</span>
+<span id="cb10-2"><a href="#cb10-2"></a><span class="co">#&gt; # A tbl_json: 500 x 3 tibble with a &quot;JSON&quot; attribute</span></span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="co">#&gt;   ..JSON                   regionname                    totalamt</span></span>
+<span id="cb10-4"><a href="#cb10-4"></a><span class="co">#&gt;   &lt;chr&gt;                    &lt;chr&gt;                            &lt;dbl&gt;</span></span>
+<span id="cb10-5"><a href="#cb10-5"></a><span class="co">#&gt; 1 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot; Africa                       130000000</span></span>
+<span id="cb10-6"><a href="#cb10-6"></a><span class="co">#&gt; 2 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot; Middle East and North Africa         0</span></span>
+<span id="cb10-7"><a href="#cb10-7"></a><span class="co">#&gt; 3 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot; East Asia and Pacific          6060000</span></span>
+<span id="cb10-8"><a href="#cb10-8"></a><span class="co">#&gt; 4 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot; Middle East and North Africa         0</span></span>
+<span id="cb10-9"><a href="#cb10-9"></a><span class="co">#&gt; # … with 496 more rows</span></span></code></pre></div>
 </div>
 <div id="object-structure" class="section level3">
 <h3>Object structure</h3>
 <p>Identify the names under an object, and their type and frequency.</p>
 <p><code>gather_object %&gt;% json_types %&gt;% count(name, type)</code></p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">worldbank <span class="op">%&gt;%</span><span class="st"> </span>gather_object <span class="op">%&gt;%</span><span class="st"> </span>json_types <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">count</span>(name, type)</a>
-<a class="sourceLine" id="cb11-2" data-line-number="2"><span class="co">#&gt; # A tibble: 8 x 3</span></a>
-<a class="sourceLine" id="cb11-3" data-line-number="3"><span class="co">#&gt;   name              type       n</span></a>
-<a class="sourceLine" id="cb11-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt;             &lt;fct&gt;  &lt;int&gt;</span></a>
-<a class="sourceLine" id="cb11-5" data-line-number="5"><span class="co">#&gt; 1 _id               object   500</span></a>
-<a class="sourceLine" id="cb11-6" data-line-number="6"><span class="co">#&gt; 2 boardapprovaldate string   500</span></a>
-<a class="sourceLine" id="cb11-7" data-line-number="7"><span class="co">#&gt; 3 closingdate       string   370</span></a>
-<a class="sourceLine" id="cb11-8" data-line-number="8"><span class="co">#&gt; 4 countryshortname  string   500</span></a>
-<a class="sourceLine" id="cb11-9" data-line-number="9"><span class="co">#&gt; # … with 4 more rows</span></a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>worldbank <span class="op">%&gt;%</span><span class="st"> </span>gather_object <span class="op">%&gt;%</span><span class="st"> </span>json_types <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">count</span>(name, type)</span>
+<span id="cb11-2"><a href="#cb11-2"></a><span class="co">#&gt; # A tibble: 8 x 3</span></span>
+<span id="cb11-3"><a href="#cb11-3"></a><span class="co">#&gt;   name              type       n</span></span>
+<span id="cb11-4"><a href="#cb11-4"></a><span class="co">#&gt;   &lt;chr&gt;             &lt;fct&gt;  &lt;int&gt;</span></span>
+<span id="cb11-5"><a href="#cb11-5"></a><span class="co">#&gt; 1 _id               object   500</span></span>
+<span id="cb11-6"><a href="#cb11-6"></a><span class="co">#&gt; 2 boardapprovaldate string   500</span></span>
+<span id="cb11-7"><a href="#cb11-7"></a><span class="co">#&gt; 3 closingdate       string   370</span></span>
+<span id="cb11-8"><a href="#cb11-8"></a><span class="co">#&gt; 4 countryshortname  string   500</span></span>
+<span id="cb11-9"><a href="#cb11-9"></a><span class="co">#&gt; # … with 4 more rows</span></span></code></pre></div>
 </div>
 <div id="gather-nested-array" class="section level3">
 <h3>Gather nested array</h3>
 <p>Enter into an array nested under an object, and gather it</p>
 <p><code>enter_object %&gt;% gather_array</code></p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">worldbank <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">enter_object</span>(majorsector_percent) <span class="op">%&gt;%</span><span class="st"> </span>gather_array</a>
-<a class="sourceLine" id="cb12-2" data-line-number="2"><span class="co">#&gt; # A tbl_json: 1,405 x 2 tibble with a &quot;JSON&quot; attribute</span></a>
-<a class="sourceLine" id="cb12-3" data-line-number="3"><span class="co">#&gt;   `attr(., &quot;JSON&quot;)`       document.id array.index</span></a>
-<a class="sourceLine" id="cb12-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt;                         &lt;int&gt;       &lt;int&gt;</span></a>
-<a class="sourceLine" id="cb12-5" data-line-number="5"><span class="co">#&gt; 1 &quot;{\&quot;Name\&quot;:\&quot;Educat...&quot;           1           1</span></a>
-<a class="sourceLine" id="cb12-6" data-line-number="6"><span class="co">#&gt; 2 &quot;{\&quot;Name\&quot;:\&quot;Educat...&quot;           1           2</span></a>
-<a class="sourceLine" id="cb12-7" data-line-number="7"><span class="co">#&gt; 3 &quot;{\&quot;Name\&quot;:\&quot;Public...&quot;           1           3</span></a>
-<a class="sourceLine" id="cb12-8" data-line-number="8"><span class="co">#&gt; 4 &quot;{\&quot;Name\&quot;:\&quot;Educat...&quot;           1           4</span></a>
-<a class="sourceLine" id="cb12-9" data-line-number="9"><span class="co">#&gt; # … with 1,401 more rows</span></a></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>worldbank <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">enter_object</span>(majorsector_percent) <span class="op">%&gt;%</span><span class="st"> </span>gather_array</span>
+<span id="cb12-2"><a href="#cb12-2"></a><span class="co">#&gt; # A tbl_json: 1,405 x 3 tibble with a &quot;JSON&quot; attribute</span></span>
+<span id="cb12-3"><a href="#cb12-3"></a><span class="co">#&gt;   ..JSON                  document.id array.index</span></span>
+<span id="cb12-4"><a href="#cb12-4"></a><span class="co">#&gt;   &lt;chr&gt;                         &lt;int&gt;       &lt;int&gt;</span></span>
+<span id="cb12-5"><a href="#cb12-5"></a><span class="co">#&gt; 1 &quot;{\&quot;Name\&quot;:\&quot;Educat...&quot;           1           1</span></span>
+<span id="cb12-6"><a href="#cb12-6"></a><span class="co">#&gt; 2 &quot;{\&quot;Name\&quot;:\&quot;Educat...&quot;           1           2</span></span>
+<span id="cb12-7"><a href="#cb12-7"></a><span class="co">#&gt; 3 &quot;{\&quot;Name\&quot;:\&quot;Public...&quot;           1           3</span></span>
+<span id="cb12-8"><a href="#cb12-8"></a><span class="co">#&gt; 4 &quot;{\&quot;Name\&quot;:\&quot;Educat...&quot;           1           4</span></span>
+<span id="cb12-9"><a href="#cb12-9"></a><span class="co">#&gt; # … with 1,401 more rows</span></span></code></pre></div>
 </div>
 <div id="filter-for-a-specific-type" class="section level3">
 <h3>Filter for a specific type</h3>
 <p>Filter to just objects / arrays and then gather them</p>
 <p><code>filter(is_json_X(.)) %&gt;% gather_X</code></p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1">companies[<span class="dv">1</span>] <span class="op">%&gt;%</span><span class="st"> </span>gather_object <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb13-2" data-line-number="2"><span class="st">  </span><span class="kw">filter</span>(<span class="kw">is_json_array</span>(.)) <span class="op">%&gt;%</span><span class="st"> </span>gather_array</a>
-<a class="sourceLine" id="cb13-3" data-line-number="3"><span class="co">#&gt; # A tbl_json: 8 x 3 tibble with a &quot;JSON&quot; attribute</span></a>
-<a class="sourceLine" id="cb13-4" data-line-number="4"><span class="co">#&gt;   `attr(., &quot;JSON&quot;)`       document.id name           array.index</span></a>
-<a class="sourceLine" id="cb13-5" data-line-number="5"><span class="co">#&gt;   &lt;chr&gt;                         &lt;int&gt; &lt;chr&gt;                &lt;int&gt;</span></a>
-<a class="sourceLine" id="cb13-6" data-line-number="6"><span class="co">#&gt; 1 &quot;{\&quot;is_past\&quot;:fals...&quot;            1 relationships            1</span></a>
-<a class="sourceLine" id="cb13-7" data-line-number="7"><span class="co">#&gt; 2 &quot;{\&quot;id\&quot;:6252,\&quot;rou...&quot;           1 funding_rounds           1</span></a>
-<a class="sourceLine" id="cb13-8" data-line-number="8"><span class="co">#&gt; 3 &quot;{\&quot;id\&quot;:15229,\&quot;ro...&quot;           1 funding_rounds           2</span></a>
-<a class="sourceLine" id="cb13-9" data-line-number="9"><span class="co">#&gt; 4 &quot;{\&quot;id\&quot;:22565,\&quot;ro...&quot;           1 funding_rounds           3</span></a>
-<a class="sourceLine" id="cb13-10" data-line-number="10"><span class="co">#&gt; # … with 4 more rows</span></a></code></pre></div>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">companies[<span class="dv">1</span>] <span class="op">%&gt;%</span><span class="st"> </span>gather_object <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb14-2" data-line-number="2"><span class="st">  </span><span class="kw">filter</span>(<span class="kw">is_json_object</span>(.)) <span class="op">%&gt;%</span><span class="st"> </span>gather_object</a>
-<a class="sourceLine" id="cb14-3" data-line-number="3"><span class="co">#&gt; Warning in gather_object(.): name column name already exists, changing to</span></a>
-<a class="sourceLine" id="cb14-4" data-line-number="4"><span class="co">#&gt; name.2</span></a>
-<a class="sourceLine" id="cb14-5" data-line-number="5"><span class="co">#&gt; # A tbl_json: 3 x 3 tibble with a &quot;JSON&quot; attribute</span></a>
-<a class="sourceLine" id="cb14-6" data-line-number="6"><span class="co">#&gt;   `attr(., &quot;JSON&quot;)`     document.id name  name.2         </span></a>
-<a class="sourceLine" id="cb14-7" data-line-number="7"><span class="co">#&gt;   &lt;chr&gt;                       &lt;int&gt; &lt;chr&gt; &lt;chr&gt;          </span></a>
-<a class="sourceLine" id="cb14-8" data-line-number="8"><span class="co">#&gt; 1 &quot;\&quot;52cdef7e4bab8b...&quot;           1 _id   $oid           </span></a>
-<a class="sourceLine" id="cb14-9" data-line-number="9"><span class="co">#&gt; 2 &quot;[[[150,22],\&quot;ass...&quot;           1 image available_sizes</span></a>
-<a class="sourceLine" id="cb14-10" data-line-number="10"><span class="co">#&gt; 3 null                            1 image attribution</span></a></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>companies[<span class="dv">1</span>] <span class="op">%&gt;%</span><span class="st"> </span>gather_object <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb13-2"><a href="#cb13-2"></a><span class="st">  </span><span class="kw">filter</span>(<span class="kw">is_json_array</span>(.)) <span class="op">%&gt;%</span><span class="st"> </span>gather_array</span>
+<span id="cb13-3"><a href="#cb13-3"></a><span class="co">#&gt; # A tbl_json: 8 x 4 tibble with a &quot;JSON&quot; attribute</span></span>
+<span id="cb13-4"><a href="#cb13-4"></a><span class="co">#&gt;   ..JSON                  document.id name           array.index</span></span>
+<span id="cb13-5"><a href="#cb13-5"></a><span class="co">#&gt;   &lt;chr&gt;                         &lt;int&gt; &lt;chr&gt;                &lt;int&gt;</span></span>
+<span id="cb13-6"><a href="#cb13-6"></a><span class="co">#&gt; 1 &quot;{\&quot;is_past\&quot;:fals...&quot;            1 relationships            1</span></span>
+<span id="cb13-7"><a href="#cb13-7"></a><span class="co">#&gt; 2 &quot;{\&quot;id\&quot;:6252,\&quot;rou...&quot;           1 funding_rounds           1</span></span>
+<span id="cb13-8"><a href="#cb13-8"></a><span class="co">#&gt; 3 &quot;{\&quot;id\&quot;:15229,\&quot;ro...&quot;           1 funding_rounds           2</span></span>
+<span id="cb13-9"><a href="#cb13-9"></a><span class="co">#&gt; 4 &quot;{\&quot;id\&quot;:22565,\&quot;ro...&quot;           1 funding_rounds           3</span></span>
+<span id="cb13-10"><a href="#cb13-10"></a><span class="co">#&gt; # … with 4 more rows</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>companies[<span class="dv">1</span>] <span class="op">%&gt;%</span><span class="st"> </span>gather_object <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb14-2"><a href="#cb14-2"></a><span class="st">  </span><span class="kw">filter</span>(<span class="kw">is_json_object</span>(.)) <span class="op">%&gt;%</span><span class="st"> </span>gather_object</span>
+<span id="cb14-3"><a href="#cb14-3"></a><span class="co">#&gt; Warning in gather_object(.): name column name already exists, changing to name.2</span></span>
+<span id="cb14-4"><a href="#cb14-4"></a><span class="co">#&gt; # A tbl_json: 3 x 4 tibble with a &quot;JSON&quot; attribute</span></span>
+<span id="cb14-5"><a href="#cb14-5"></a><span class="co">#&gt;   ..JSON                document.id name  name.2         </span></span>
+<span id="cb14-6"><a href="#cb14-6"></a><span class="co">#&gt;   &lt;chr&gt;                       &lt;int&gt; &lt;chr&gt; &lt;chr&gt;          </span></span>
+<span id="cb14-7"><a href="#cb14-7"></a><span class="co">#&gt; 1 &quot;\&quot;52cdef7e4bab8b...&quot;           1 _id   $oid           </span></span>
+<span id="cb14-8"><a href="#cb14-8"></a><span class="co">#&gt; 2 &quot;[[[150,22],\&quot;ass...&quot;           1 image available_sizes</span></span>
+<span id="cb14-9"><a href="#cb14-9"></a><span class="co">#&gt; 3 &quot;null&quot;                          1 image attribution</span></span></code></pre></div>
 </div>
 <div id="gather-and-append" class="section level3">
 <h3>Gather and append</h3>
 <p>Useful when data is stored in object names as well as values</p>
 <p><code>gather_object %&gt;% append_values_X</code></p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1">json &lt;-<span class="st"> '{&quot;2015&quot;: 5, &quot;2016&quot;: 10}'</span></a>
-<a class="sourceLine" id="cb15-2" data-line-number="2">json <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">gather_object</span>(<span class="st">&quot;year&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">append_values_number</span>(<span class="st">&quot;count&quot;</span>)</a>
-<a class="sourceLine" id="cb15-3" data-line-number="3"><span class="co">#&gt; # A tbl_json: 2 x 3 tibble with a &quot;JSON&quot; attribute</span></a>
-<a class="sourceLine" id="cb15-4" data-line-number="4"><span class="co">#&gt;   `attr(., &quot;JSON&quot;)` document.id year  count</span></a>
-<a class="sourceLine" id="cb15-5" data-line-number="5"><span class="co">#&gt;   &lt;chr&gt;                   &lt;int&gt; &lt;chr&gt; &lt;dbl&gt;</span></a>
-<a class="sourceLine" id="cb15-6" data-line-number="6"><span class="co">#&gt; 1 5                           1 2015      5</span></a>
-<a class="sourceLine" id="cb15-7" data-line-number="7"><span class="co">#&gt; 2 10                          1 2016     10</span></a></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>json &lt;-<span class="st"> &#39;{&quot;2015&quot;: 5, &quot;2016&quot;: 10}&#39;</span></span>
+<span id="cb15-2"><a href="#cb15-2"></a>json <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">gather_object</span>(<span class="st">&quot;year&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">append_values_number</span>(<span class="st">&quot;count&quot;</span>)</span>
+<span id="cb15-3"><a href="#cb15-3"></a><span class="co">#&gt; # A tbl_json: 2 x 4 tibble with a &quot;JSON&quot; attribute</span></span>
+<span id="cb15-4"><a href="#cb15-4"></a><span class="co">#&gt;   ..JSON document.id year  count</span></span>
+<span id="cb15-5"><a href="#cb15-5"></a><span class="co">#&gt;   &lt;chr&gt;        &lt;int&gt; &lt;chr&gt; &lt;dbl&gt;</span></span>
+<span id="cb15-6"><a href="#cb15-6"></a><span class="co">#&gt; 1 5                1 2015      5</span></span>
+<span id="cb15-7"><a href="#cb15-7"></a><span class="co">#&gt; 2 10               1 2016     10</span></span></code></pre></div>
 </div>
 </div>
 <div id="getting-started-with-json-data" class="section level2">
@@ -600,63 +598,63 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <div id="character-vector" class="section level3">
 <h3>Character vector</h3>
 <p>The simplest case is when your JSON data is already in R as a character vector, like the <code>worldbank</code> data:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1">worldbank <span class="op">%&gt;%</span><span class="st"> </span>as.tbl_json</a>
-<a class="sourceLine" id="cb16-2" data-line-number="2"><span class="co">#&gt; # A tbl_json: 500 x 1 tibble with a &quot;JSON&quot; attribute</span></a>
-<a class="sourceLine" id="cb16-3" data-line-number="3"><span class="co">#&gt;   `attr(., &quot;JSON&quot;)`        document.id</span></a>
-<a class="sourceLine" id="cb16-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt;                          &lt;int&gt;</span></a>
-<a class="sourceLine" id="cb16-5" data-line-number="5"><span class="co">#&gt; 1 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot;           1</span></a>
-<a class="sourceLine" id="cb16-6" data-line-number="6"><span class="co">#&gt; 2 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot;           2</span></a>
-<a class="sourceLine" id="cb16-7" data-line-number="7"><span class="co">#&gt; 3 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot;           3</span></a>
-<a class="sourceLine" id="cb16-8" data-line-number="8"><span class="co">#&gt; 4 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot;           4</span></a>
-<a class="sourceLine" id="cb16-9" data-line-number="9"><span class="co">#&gt; # … with 496 more rows</span></a></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>worldbank <span class="op">%&gt;%</span><span class="st"> </span>as.tbl_json</span>
+<span id="cb16-2"><a href="#cb16-2"></a><span class="co">#&gt; # A tbl_json: 500 x 2 tibble with a &quot;JSON&quot; attribute</span></span>
+<span id="cb16-3"><a href="#cb16-3"></a><span class="co">#&gt;   ..JSON                   document.id</span></span>
+<span id="cb16-4"><a href="#cb16-4"></a><span class="co">#&gt;   &lt;chr&gt;                          &lt;int&gt;</span></span>
+<span id="cb16-5"><a href="#cb16-5"></a><span class="co">#&gt; 1 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot;           1</span></span>
+<span id="cb16-6"><a href="#cb16-6"></a><span class="co">#&gt; 2 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot;           2</span></span>
+<span id="cb16-7"><a href="#cb16-7"></a><span class="co">#&gt; 3 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot;           3</span></span>
+<span id="cb16-8"><a href="#cb16-8"></a><span class="co">#&gt; 4 &quot;{\&quot;_id\&quot;:{\&quot;$oid\&quot;:...&quot;           4</span></span>
+<span id="cb16-9"><a href="#cb16-9"></a><span class="co">#&gt; # … with 496 more rows</span></span></code></pre></div>
 <p>If this generates errors, then likely your JSON data is malformed:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1">bad_json &lt;-<span class="st"> '{&quot;key&quot;: &quot;value&quot;'</span></a>
-<a class="sourceLine" id="cb17-2" data-line-number="2">bad_json <span class="op">%&gt;%</span><span class="st"> </span>as.tbl_json</a>
-<a class="sourceLine" id="cb17-3" data-line-number="3"><span class="co">#&gt; Error: parse error: premature EOF</span></a>
-<a class="sourceLine" id="cb17-4" data-line-number="4"><span class="co">#&gt;                                        {&quot;key&quot;: &quot;value&quot;</span></a>
-<a class="sourceLine" id="cb17-5" data-line-number="5"><span class="co">#&gt;                      (right here) ------^</span></a></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a>bad_json &lt;-<span class="st"> &#39;{&quot;key&quot;: &quot;value&quot;&#39;</span></span>
+<span id="cb17-2"><a href="#cb17-2"></a>bad_json <span class="op">%&gt;%</span><span class="st"> </span>as.tbl_json</span>
+<span id="cb17-3"><a href="#cb17-3"></a><span class="co">#&gt; Error: parse error: premature EOF</span></span>
+<span id="cb17-4"><a href="#cb17-4"></a><span class="co">#&gt;                                        {&quot;key&quot;: &quot;value&quot;</span></span>
+<span id="cb17-5"><a href="#cb17-5"></a><span class="co">#&gt;                      (right here) ------^</span></span></code></pre></div>
 <p>tidyjson uses <code>jsonlite::fromJSON</code> to parse the JSON, and so will print out a useful error message.</p>
 </div>
 <div id="single-array" class="section level3">
 <h3>Single array</h3>
 <p>Many APIs will return multiple documents in a single array, like the <code>issues</code> data from github.</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1">issues <span class="op">%&gt;%</span><span class="st"> </span>as.tbl_json</a>
-<a class="sourceLine" id="cb18-2" data-line-number="2"><span class="co">#&gt; # A tbl_json: 1 x 1 tibble with a &quot;JSON&quot; attribute</span></a>
-<a class="sourceLine" id="cb18-3" data-line-number="3"><span class="co">#&gt;   `attr(., &quot;JSON&quot;)`       document.id</span></a>
-<a class="sourceLine" id="cb18-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt;                         &lt;int&gt;</span></a>
-<a class="sourceLine" id="cb18-5" data-line-number="5"><span class="co">#&gt; 1 &quot;[{\&quot;url\&quot;:\&quot;https:...&quot;           1</span></a></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a>issues <span class="op">%&gt;%</span><span class="st"> </span>as.tbl_json</span>
+<span id="cb18-2"><a href="#cb18-2"></a><span class="co">#&gt; # A tbl_json: 1 x 2 tibble with a &quot;JSON&quot; attribute</span></span>
+<span id="cb18-3"><a href="#cb18-3"></a><span class="co">#&gt;   ..JSON                  document.id</span></span>
+<span id="cb18-4"><a href="#cb18-4"></a><span class="co">#&gt;   &lt;chr&gt;                         &lt;int&gt;</span></span>
+<span id="cb18-5"><a href="#cb18-5"></a><span class="co">#&gt; 1 &quot;[{\&quot;url\&quot;:\&quot;https:...&quot;           1</span></span></code></pre></div>
 <p>A single call to gather_array makes this data look like the <code>worldbank</code> data:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1">issues <span class="op">%&gt;%</span><span class="st"> </span>as.tbl_json <span class="op">%&gt;%</span><span class="st"> </span>gather_array</a>
-<a class="sourceLine" id="cb19-2" data-line-number="2"><span class="co">#&gt; # A tbl_json: 30 x 2 tibble with a &quot;JSON&quot; attribute</span></a>
-<a class="sourceLine" id="cb19-3" data-line-number="3"><span class="co">#&gt;   `attr(., &quot;JSON&quot;)`       document.id array.index</span></a>
-<a class="sourceLine" id="cb19-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt;                         &lt;int&gt;       &lt;int&gt;</span></a>
-<a class="sourceLine" id="cb19-5" data-line-number="5"><span class="co">#&gt; 1 &quot;{\&quot;url\&quot;:\&quot;https:/...&quot;           1           1</span></a>
-<a class="sourceLine" id="cb19-6" data-line-number="6"><span class="co">#&gt; 2 &quot;{\&quot;url\&quot;:\&quot;https:/...&quot;           1           2</span></a>
-<a class="sourceLine" id="cb19-7" data-line-number="7"><span class="co">#&gt; 3 &quot;{\&quot;url\&quot;:\&quot;https:/...&quot;           1           3</span></a>
-<a class="sourceLine" id="cb19-8" data-line-number="8"><span class="co">#&gt; 4 &quot;{\&quot;url\&quot;:\&quot;https:/...&quot;           1           4</span></a>
-<a class="sourceLine" id="cb19-9" data-line-number="9"><span class="co">#&gt; # … with 26 more rows</span></a></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a>issues <span class="op">%&gt;%</span><span class="st"> </span>as.tbl_json <span class="op">%&gt;%</span><span class="st"> </span>gather_array</span>
+<span id="cb19-2"><a href="#cb19-2"></a><span class="co">#&gt; # A tbl_json: 30 x 3 tibble with a &quot;JSON&quot; attribute</span></span>
+<span id="cb19-3"><a href="#cb19-3"></a><span class="co">#&gt;   ..JSON                  document.id array.index</span></span>
+<span id="cb19-4"><a href="#cb19-4"></a><span class="co">#&gt;   &lt;chr&gt;                         &lt;int&gt;       &lt;int&gt;</span></span>
+<span id="cb19-5"><a href="#cb19-5"></a><span class="co">#&gt; 1 &quot;{\&quot;url\&quot;:\&quot;https:/...&quot;           1           1</span></span>
+<span id="cb19-6"><a href="#cb19-6"></a><span class="co">#&gt; 2 &quot;{\&quot;url\&quot;:\&quot;https:/...&quot;           1           2</span></span>
+<span id="cb19-7"><a href="#cb19-7"></a><span class="co">#&gt; 3 &quot;{\&quot;url\&quot;:\&quot;https:/...&quot;           1           3</span></span>
+<span id="cb19-8"><a href="#cb19-8"></a><span class="co">#&gt; 4 &quot;{\&quot;url\&quot;:\&quot;https:/...&quot;           1           4</span></span>
+<span id="cb19-9"><a href="#cb19-9"></a><span class="co">#&gt; # … with 26 more rows</span></span></code></pre></div>
 </div>
 <div id="list" class="section level3">
 <h3>List</h3>
 <p>If your JSON is a list of character strings, you can use `purrr::flatten_chr’ to flatten it into a character vector and then proceed as usual:</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="kw">library</span>(purrr)</a>
-<a class="sourceLine" id="cb20-2" data-line-number="2"><span class="kw">list</span>(<span class="st">'1'</span>, <span class="st">'2'</span>) <span class="op">%&gt;%</span><span class="st"> </span>flatten_chr <span class="op">%&gt;%</span><span class="st"> </span>as.tbl_json</a>
-<a class="sourceLine" id="cb20-3" data-line-number="3"><span class="co">#&gt; # A tbl_json: 2 x 1 tibble with a &quot;JSON&quot; attribute</span></a>
-<a class="sourceLine" id="cb20-4" data-line-number="4"><span class="co">#&gt;   `attr(., &quot;JSON&quot;)` document.id</span></a>
-<a class="sourceLine" id="cb20-5" data-line-number="5"><span class="co">#&gt;   &lt;chr&gt;                   &lt;int&gt;</span></a>
-<a class="sourceLine" id="cb20-6" data-line-number="6"><span class="co">#&gt; 1 1                           1</span></a>
-<a class="sourceLine" id="cb20-7" data-line-number="7"><span class="co">#&gt; 2 2                           2</span></a></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="kw">library</span>(purrr)</span>
+<span id="cb20-2"><a href="#cb20-2"></a><span class="kw">list</span>(<span class="st">&#39;1&#39;</span>, <span class="st">&#39;2&#39;</span>) <span class="op">%&gt;%</span><span class="st"> </span>flatten_chr <span class="op">%&gt;%</span><span class="st"> </span>as.tbl_json</span>
+<span id="cb20-3"><a href="#cb20-3"></a><span class="co">#&gt; # A tbl_json: 2 x 2 tibble with a &quot;JSON&quot; attribute</span></span>
+<span id="cb20-4"><a href="#cb20-4"></a><span class="co">#&gt;   ..JSON document.id</span></span>
+<span id="cb20-5"><a href="#cb20-5"></a><span class="co">#&gt;   &lt;chr&gt;        &lt;int&gt;</span></span>
+<span id="cb20-6"><a href="#cb20-6"></a><span class="co">#&gt; 1 1                1</span></span>
+<span id="cb20-7"><a href="#cb20-7"></a><span class="co">#&gt; 2 2                2</span></span></code></pre></div>
 </div>
 <div id="data-frame" class="section level3">
 <h3>Data frame</h3>
 <p>If you extracted JSON from a table in a database into a data frame, then likely you already have other columns in the data frame you would like to retain. You can use then <code>json.column</code> argument to <code>as.tbl_json</code> to specify which column contains the JSON of interest:</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1">df &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">id =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="dt">json =</span> <span class="kw">list</span>(<span class="st">'[1, 2]'</span>, <span class="st">'[3, 4]'</span>))</a>
-<a class="sourceLine" id="cb21-2" data-line-number="2">df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as.tbl_json</span>(<span class="dt">json.column =</span> <span class="st">&quot;json&quot;</span>)</a>
-<a class="sourceLine" id="cb21-3" data-line-number="3"><span class="co">#&gt; # A tbl_json: 2 x 1 tibble with a &quot;JSON&quot; attribute</span></a>
-<a class="sourceLine" id="cb21-4" data-line-number="4"><span class="co">#&gt;   `attr(., &quot;JSON&quot;)`    id</span></a>
-<a class="sourceLine" id="cb21-5" data-line-number="5"><span class="co">#&gt;   &lt;chr&gt;             &lt;int&gt;</span></a>
-<a class="sourceLine" id="cb21-6" data-line-number="6"><span class="co">#&gt; 1 [1,2]                 1</span></a>
-<a class="sourceLine" id="cb21-7" data-line-number="7"><span class="co">#&gt; 2 [3,4]                 2</span></a></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a>df &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">id =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="dt">json =</span> <span class="kw">list</span>(<span class="st">&#39;[1, 2]&#39;</span>, <span class="st">&#39;[3, 4]&#39;</span>))</span>
+<span id="cb21-2"><a href="#cb21-2"></a>df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as.tbl_json</span>(<span class="dt">json.column =</span> <span class="st">&quot;json&quot;</span>)</span>
+<span id="cb21-3"><a href="#cb21-3"></a><span class="co">#&gt; # A tbl_json: 2 x 2 tibble with a &quot;JSON&quot; attribute</span></span>
+<span id="cb21-4"><a href="#cb21-4"></a><span class="co">#&gt;   ..JSON          id</span></span>
+<span id="cb21-5"><a href="#cb21-5"></a><span class="co">#&gt;   &lt;chr&gt;        &lt;int&gt;</span></span>
+<span id="cb21-6"><a href="#cb21-6"></a><span class="co">#&gt; 1 &quot;\&quot;[1, 2]\&quot;&quot;     1</span></span>
+<span id="cb21-7"><a href="#cb21-7"></a><span class="co">#&gt; 2 &quot;\&quot;[3, 4]\&quot;&quot;     2</span></span></code></pre></div>
 </div>
 <div id="file" class="section level3">
 <h3>File</h3>

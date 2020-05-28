@@ -136,7 +136,9 @@ json_structure_empty <- function() {
 json_structure_level <- function(s) {
 
   new_s <- json_structure_empty()
-  new_s <- new_s %>% dplyr::select(!!!names(s)[names(s) %in% names(new_s)])
+  cols_select <- names(s)[names(s) %in% names(new_s)]
+  cols_select <- setdiff(cols_select, "..JSON")
+  new_s <- new_s %>% dplyr::select(!!!cols_select)
 
   # Expand any objects
   if (any(s$type == "object")) {
@@ -194,7 +196,7 @@ json_structure_objects <- function(s) {
     )
 
   # Reconstruct tbl_json object
-  tbl_json(df_s, attr(expand_s, "JSON"))
+  tbl_json(df_s, json_get(expand_s))
 
 }
 

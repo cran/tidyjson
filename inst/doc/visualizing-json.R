@@ -1,9 +1,9 @@
-## ---- echo = FALSE, message = FALSE--------------------------------------
+## ---- echo = FALSE, message = FALSE-------------------------------------------
 knitr::opts_chunk$set(collapse = T, comment = "#>")
 knitr::opts_chunk$set(fig.width = 7, fig.height = 5)
 options(tibble.print_min = 4L, tibble.print_max = 4L)
 
-## ---- message = FALSE----------------------------------------------------
+## ---- message = FALSE---------------------------------------------------------
 library(jsonlite)
 library(dplyr)
 library(purrr)
@@ -19,32 +19,32 @@ library(tidyjson)
 
 set.seed(1)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 co_length <- companies %>% json_complexity
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 co_length %>%
   ggplot(aes(complexity)) +
     geom_density() +
     scale_x_log10() +
     annotation_logticks(side = 'b')
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 co_examp_index <- which(co_length$complexity == 20L)[1]
 
 co_examp <- companies[co_examp_index]
 
 co_examp
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 co_examp %>% jsonedit(mode = "code")
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 co_struct <- companies %>% sample(5) %>% json_structure
 
 print(co_struct)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 co_names <- co_struct %>% 
   filter(type != "null" & !is.na(name)) %>%
   group_by(level, name, type) %>%
@@ -52,10 +52,10 @@ co_names <- co_struct %>%
 
 co_names
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 co_names %$% wordcloud(name, ndoc, scale = c(1.5, .1), min.freq = 100)
 
-## ---- fig.height = 9-----------------------------------------------------
+## ---- fig.height = 9----------------------------------------------------------
 co_names %>%
   ungroup %>%
   group_by(type) %>%
@@ -69,7 +69,7 @@ co_names %>%
     theme(legend.position = "bottom") +
     scale_color_viridis(direction = -1)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 # Plots an igraph visualization of a JSON document
 #
 # @param .x a JSON string or tbl_json object
@@ -132,7 +132,7 @@ plot_json_graph <- function(.x, legend = TRUE, vertex.size = 6,
 
 }
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 '{"object" : {"name": 1},
   "array"  : ["a", "b"],
   "string" : "value", 
@@ -141,10 +141,10 @@ plot_json_graph <- function(.x, legend = TRUE, vertex.size = 6,
   "null"   : null}' %>% 
   plot_json_graph
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 co_examp %>% plot_json_graph
 
-## ---- fig.height = 8-----------------------------------------------------
+## ---- fig.height = 8----------------------------------------------------------
 plot_json_graph_panel <- function(json, nrow, ncol, ...) {
   
   # Set up grid
@@ -162,34 +162,34 @@ plot_json_graph_panel <- function(json, nrow, ncol, ...) {
   invisible(NULL)
 }
 
-## ---- fig.height = 8-----------------------------------------------------
+## ---- fig.height = 8----------------------------------------------------------
 plot_json_graph_panel(companies %>% sample(5), 7, 6, legend = FALSE, show.labels = FALSE,
                       vertex.size = 4)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 most_complex <- companies[which(co_length$complexity == max(co_length$complexity))]
 
 most_complex_name <- most_complex %>% 
   spread_values(name = jstring(name)) %>% 
   extract2("name")
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 plot_json_graph(most_complex, show.labels = FALSE, vertex.size = 2)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 most_complex %>% json_schema %>% jsonedit(mode = "code")
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 most_complex %>% json_schema(type = "value") %>% plot_json_graph
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 most_complex %>% gather_object %>% json_types %>% json_complexity %>%
   filter(type %in% c('array', 'object') & complexity >= 15) %>%
   split(.$name) %>%
   map(json_schema, type = "value") %>%
   plot_json_graph_panel(3, 3, legend = FALSE)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 rounds <- companies %>%
   enter_object(funding_rounds) %>%
   gather_array %>%
@@ -200,7 +200,7 @@ rounds <- companies %>%
   )
 rounds %>% head
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 geos <- companies %>%
   enter_object(offices) %>%
   gather_array %>%
@@ -211,7 +211,7 @@ geos <- companies %>%
   )
 geos %>% head
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 hqs <- geos %>%
   filter(array.index == 1) %>%
   filter(country == "USA") %>%
@@ -224,7 +224,7 @@ rounds_usd <- rounds %>%
 
 rounds_by_geo <- inner_join(rounds_usd, hqs, by = "document.id") %>% as_tibble()
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 round_prep <- rounds_by_geo %>% 
   dplyr::filter(!is.na(state)) %>%
   mutate(
@@ -246,4 +246,6 @@ g <- ggplot(round_prep, aes(state, raised, fill = state)) +
   facet_grid(. ~ round) +
   theme(legend.position = "bottom") +
   labs(x = "", y = "Amount Raised (USD)")
+
+g
 
