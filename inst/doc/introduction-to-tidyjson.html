@@ -11,7 +11,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
 
-<meta name="date" content="2020-05-28" />
+<meta name="date" content="2020-05-31" />
 
 <title>Introduction to tidyjson</title>
 
@@ -301,7 +301,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 <h1 class="title toc-ignore">Introduction to tidyjson</h1>
-<h4 class="date">2020-05-28</h4>
+<h4 class="date">2020-05-31</h4>
 
 
 
@@ -425,15 +425,16 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb9-4"><a href="#cb9-4"></a><span class="st">  </span>spread_all <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">rename</span>(<span class="dt">sector =</span> Name, <span class="dt">percent =</span> Percent) <span class="op">%&gt;%</span></span>
 <span id="cb9-5"><a href="#cb9-5"></a><span class="st">  </span><span class="kw">group_by</span>(region, sector) <span class="op">%&gt;%</span></span>
 <span id="cb9-6"><a href="#cb9-6"></a><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">funding =</span> <span class="kw">sum</span>(funding <span class="op">*</span><span class="st"> </span>percent))</span>
-<span id="cb9-7"><a href="#cb9-7"></a><span class="co">#&gt; # A tibble: 63 x 3</span></span>
-<span id="cb9-8"><a href="#cb9-8"></a><span class="co">#&gt; # Groups:   region [7]</span></span>
-<span id="cb9-9"><a href="#cb9-9"></a><span class="co">#&gt;   region sector                                 funding</span></span>
-<span id="cb9-10"><a href="#cb9-10"></a><span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;                                    &lt;dbl&gt;</span></span>
-<span id="cb9-11"><a href="#cb9-11"></a><span class="co">#&gt; 1 Africa Agriculture, fishing, and forestry 96648500000</span></span>
-<span id="cb9-12"><a href="#cb9-12"></a><span class="co">#&gt; 2 Africa Education                          83370000000</span></span>
-<span id="cb9-13"><a href="#cb9-13"></a><span class="co">#&gt; 3 Africa Energy and mining                  86709960000</span></span>
-<span id="cb9-14"><a href="#cb9-14"></a><span class="co">#&gt; 4 Africa Finance                            30761000000</span></span>
-<span id="cb9-15"><a href="#cb9-15"></a><span class="co">#&gt; # … with 59 more rows</span></span></code></pre></div>
+<span id="cb9-7"><a href="#cb9-7"></a><span class="co">#&gt; `summarise()` regrouping output by &#39;region&#39; (override with `.groups` argument)</span></span>
+<span id="cb9-8"><a href="#cb9-8"></a><span class="co">#&gt; # A tibble: 63 x 3</span></span>
+<span id="cb9-9"><a href="#cb9-9"></a><span class="co">#&gt; # Groups:   region [7]</span></span>
+<span id="cb9-10"><a href="#cb9-10"></a><span class="co">#&gt;   region sector                                 funding</span></span>
+<span id="cb9-11"><a href="#cb9-11"></a><span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;                                    &lt;dbl&gt;</span></span>
+<span id="cb9-12"><a href="#cb9-12"></a><span class="co">#&gt; 1 Africa Agriculture, fishing, and forestry 96648500000</span></span>
+<span id="cb9-13"><a href="#cb9-13"></a><span class="co">#&gt; 2 Africa Education                          83370000000</span></span>
+<span id="cb9-14"><a href="#cb9-14"></a><span class="co">#&gt; 3 Africa Energy and mining                  86709960000</span></span>
+<span id="cb9-15"><a href="#cb9-15"></a><span class="co">#&gt; 4 Africa Finance                            30761000000</span></span>
+<span id="cb9-16"><a href="#cb9-16"></a><span class="co">#&gt; # … with 59 more rows</span></span></code></pre></div>
 </div>
 <div id="tidyjson-functions" class="section level2">
 <h2>Tidyjson functions</h2>

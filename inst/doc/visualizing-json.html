@@ -11,7 +11,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
 
-<meta name="date" content="2020-05-28" />
+<meta name="date" content="2020-05-31" />
 
 <title>Visualizing JSON schema</title>
 
@@ -1282,7 +1282,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 <h1 class="title toc-ignore">Visualizing JSON schema</h1>
-<h4 class="date">2020-05-28</h4>
+<h4 class="date">2020-05-31</h4>
 
 
 
@@ -1377,17 +1377,18 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb7-2"><a href="#cb7-2"></a><span class="st">  </span><span class="kw">filter</span>(type <span class="op">!=</span><span class="st"> &quot;null&quot;</span> <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(name)) <span class="op">%&gt;%</span></span>
 <span id="cb7-3"><a href="#cb7-3"></a><span class="st">  </span><span class="kw">group_by</span>(level, name, type) <span class="op">%&gt;%</span></span>
 <span id="cb7-4"><a href="#cb7-4"></a><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">ndoc =</span> <span class="kw">n_distinct</span>(document.id))</span>
-<span id="cb7-5"><a href="#cb7-5"></a></span>
-<span id="cb7-6"><a href="#cb7-6"></a>co_names</span>
-<span id="cb7-7"><a href="#cb7-7"></a><span class="co">#&gt; # A tibble: 106 x 4</span></span>
-<span id="cb7-8"><a href="#cb7-8"></a><span class="co">#&gt; # Groups:   level, name [106]</span></span>
-<span id="cb7-9"><a href="#cb7-9"></a><span class="co">#&gt;   level name         type    ndoc</span></span>
-<span id="cb7-10"><a href="#cb7-10"></a><span class="co">#&gt;   &lt;int&gt; &lt;chr&gt;        &lt;fct&gt;  &lt;int&gt;</span></span>
-<span id="cb7-11"><a href="#cb7-11"></a><span class="co">#&gt; 1     1 _id          object     5</span></span>
-<span id="cb7-12"><a href="#cb7-12"></a><span class="co">#&gt; 2     1 acquisition  object     1</span></span>
-<span id="cb7-13"><a href="#cb7-13"></a><span class="co">#&gt; 3     1 acquisitions array      5</span></span>
-<span id="cb7-14"><a href="#cb7-14"></a><span class="co">#&gt; 4     1 alias_list   string     2</span></span>
-<span id="cb7-15"><a href="#cb7-15"></a><span class="co">#&gt; # … with 102 more rows</span></span></code></pre></div>
+<span id="cb7-5"><a href="#cb7-5"></a><span class="co">#&gt; `summarise()` regrouping output by &#39;level&#39;, &#39;name&#39; (override with `.groups` argument)</span></span>
+<span id="cb7-6"><a href="#cb7-6"></a></span>
+<span id="cb7-7"><a href="#cb7-7"></a>co_names</span>
+<span id="cb7-8"><a href="#cb7-8"></a><span class="co">#&gt; # A tibble: 106 x 4</span></span>
+<span id="cb7-9"><a href="#cb7-9"></a><span class="co">#&gt; # Groups:   level, name [106]</span></span>
+<span id="cb7-10"><a href="#cb7-10"></a><span class="co">#&gt;   level name         type    ndoc</span></span>
+<span id="cb7-11"><a href="#cb7-11"></a><span class="co">#&gt;   &lt;int&gt; &lt;chr&gt;        &lt;fct&gt;  &lt;int&gt;</span></span>
+<span id="cb7-12"><a href="#cb7-12"></a><span class="co">#&gt; 1     1 _id          object     5</span></span>
+<span id="cb7-13"><a href="#cb7-13"></a><span class="co">#&gt; 2     1 acquisition  object     1</span></span>
+<span id="cb7-14"><a href="#cb7-14"></a><span class="co">#&gt; 3     1 acquisitions array      5</span></span>
+<span id="cb7-15"><a href="#cb7-15"></a><span class="co">#&gt; 4     1 alias_list   string     2</span></span>
+<span id="cb7-16"><a href="#cb7-16"></a><span class="co">#&gt; # … with 102 more rows</span></span></code></pre></div>
 <p>We can get a quick overview of the most common names using a <code>wordcloud</code>.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>co_names <span class="op">%$%</span><span class="st"> </span><span class="kw">wordcloud</span>(name, ndoc, <span class="dt">scale =</span> <span class="kw">c</span>(<span class="fl">1.5</span>, <span class="fl">.1</span>), <span class="dt">min.freq =</span> <span class="dv">100</span>)</span>
 <span id="cb8-2"><a href="#cb8-2"></a><span class="co">#&gt; Warning in wordcloud(name, ndoc, scale = c(1.5, 0.1), min.freq = 100):</span></span>
