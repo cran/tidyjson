@@ -1,5 +1,3 @@
-context("path")
-
 test_that("works with unquoted input", {
 
   expect_identical(
@@ -18,10 +16,34 @@ test_that("works with quoted input", {
 
 })
 
-test_that("throws an error on mixed input", {
+test_that("works with quasiquotation", {
+  testfunc <- function(b) {
+    path(!!b)
+  }
+  testfunc2 <- function(b) {
+    path(!!!b)
+  }
+  
+  expect_identical(
+    testfunc("a"),
+    structure(c("a"), class = "path")
+  )
+  
+  expect_identical(
+    testfunc2(c("a", "b")),
+    structure(c("a","b"), class = "path")
+  )
+})
 
-  expect_error(path(a, "b"))
-
+test_that("works with data masking", {
+  testfunc <- function(a) {
+    path({{a}})
+  }
+  
+  expect_identical(
+    testfunc("chicken"),
+    structure(c("chicken"), class = "path")
+  )
 })
 
 test_that("throws an error on length > 1 input", {

@@ -1,6 +1,4 @@
-context("jstring")
-
-test_that("works with simple input", {
+test_that("jstring works with simple input", {
 
     json <- list(
       fromJSON('{"name": {"first": "bob", "last": "smith"}}'),
@@ -16,7 +14,7 @@ test_that("works with simple input", {
   }
 )
 
-test_that("works with unquoted strings", {
+test_that("jstring works with unquoted strings", {
 
   json <- list(
     fromJSON('{"name": {"first": "bob", "last": "smith"}}'),
@@ -29,7 +27,7 @@ test_that("works with unquoted strings", {
 }
 )
 
-test_that("handles missing input properly", {
+test_that("jstring handles missing input properly", {
 
     json <- list(
       fromJSON('{"name": "bob"}'),
@@ -45,9 +43,22 @@ test_that("handles missing input properly", {
   }
 )
 
-context("jnumber")
+test_that("jdouble handles missing input properly", {
+  
+  json <- list(
+    fromJSON('{"age": 32}'),
+    fromJSON('{"age": null}'),
+    fromJSON('{"AGE": 32}'),
+    fromJSON('{}')
+  )
+  
+  expect_identical(jdouble("age")(json),
+                   c(32, NA_real_, NA_real_, NA_real_)
+  )
+}
+)
 
-test_that("handles missing input properly", {
+test_that("jnumber handles missing input properly", {
 
     json <- list(
       fromJSON('{"age": 32}'),
@@ -62,9 +73,7 @@ test_that("handles missing input properly", {
   }
 )
 
-context("jlogical")
-
-test_that("handles missing input properly", {
+test_that("jlogical handles missing input properly", {
 
     json <- list(
       fromJSON('{"is.past": true}'),
@@ -84,9 +93,22 @@ test_that("handles missing input properly", {
   }
 )
 
-context("spread_values")
+test_that("jinteger handles missing input properly", {
+  
+  json <- list(
+    fromJSON('{"age": 32}'),
+    fromJSON('{"age": null}'),
+    fromJSON('{"AGE": 32}'),
+    fromJSON('{}')
+  )
+  
+  expect_identical(jinteger("age")(json),
+                   c(32L, NA_integer_, NA_integer_, NA_integer_)
+  )
+}
+)
 
-test_that("extract various values", {
+test_that("spread_values extract various values", {
 
     json <- '{"name": "bob", "age": 32, "customer": true}'
     expected_value <- tbl_json(
@@ -94,6 +116,8 @@ test_that("extract various values", {
           document.id = 1L,
           name = "bob",
           age = 32,
+          age_dbl = 32.,
+          age_int = 32L,
           customer = TRUE,
           stringsAsFactors = FALSE
         ), list(fromJSON(json)))
@@ -103,6 +127,8 @@ test_that("extract various values", {
         spread_values(
           name = jstring("name"),
           age = jnumber("age"),
+          age_dbl = jdouble("age"),
+          age_int = jinteger("age"),
           customer = jlogical("customer")
         ),
       expected_value
@@ -110,7 +136,7 @@ test_that("extract various values", {
   }
 )
 
-test_that("extract down a path", {
+test_that("spread_values extract down a path", {
 
     json <- '{"name": {"first": "bob", "last": "smith"}}'
     expected_value <-  tbl_json(
@@ -128,7 +154,7 @@ test_that("extract down a path", {
   }
 )
 
-test_that("correctly handles character(0)", {
+test_that("spread_values correctly handles character(0)", {
 
     empty <- tbl_json(
       data.frame(
@@ -143,7 +169,7 @@ test_that("correctly handles character(0)", {
   }
 )
 
-test_that("correctly handles {}", {
+test_that("spread_values correctly handles {}", {
 
     nl <- list()
     names(nl) <- character(0)
@@ -159,7 +185,7 @@ test_that("correctly handles {}", {
 )
 
 
-test_that("correctly handles []", {
+test_that("spread_values correctly handles []", {
 
     empty <- tbl_json(
       data.frame(
@@ -172,18 +198,22 @@ test_that("correctly handles []", {
   }
 )
 
-test_that('correctly handles over-specified path', {
+test_that('spread_values correctly handles over-specified path', {
   json <- '{ "a" : 1 , "b" : "text", "c" : true }' 
   
+  expect_equal(json %>% spread_values(a = jdouble("a", "b")) %>% .$a, as.double(NA))
+  expect_equal(json %>% spread_values(a = jdouble("a", "b")) %>% .$a, as.numeric(NA))
+  
+  expect_equal(json %>% spread_values(a = jnumber("a", "b")) %>% .$a, as.double(NA))
   expect_equal(json %>% spread_values(a = jnumber("a", "b")) %>% .$a, as.numeric(NA))
   
   expect_equal(json %>% spread_values(b = jstring('b','c')) %>% .$b, as.character(NA))
   
   expect_equal(json %>% spread_values(c = jlogical('c','d')) %>% .$c, as.logical(NA))
+  
+  expect_equal(json %>% spread_values(c = jinteger('c','d')) %>% .$c, as.integer(NA))
 })
 
-
-context("recursive option")
 
 test_that("recursive works for simple input", {
 
@@ -296,10 +326,10 @@ test_that("either throws an error when type converting", {
 
 test_that("works with x, json as input", {
 
-  expect_identical('{"x": 1}' %>% spread_values(x = jstring("x")),
-                   '{"x": 1}' %>% spread_values(y = jstring("x")) %>% rename(x = y))
+  expect_identical('{"x": 1}' %>% spread_values(x = jnumber("x")),
+                   '{"x": 1}' %>% spread_values(y = jnumber("x")) %>% rename(x = y))
 
-  expect_identical('{"json": 1}' %>% spread_values(json = jstring("json")),
-                   '{"json": 1}' %>% spread_values(y = jstring("json")) %>% rename(json = y))
+  expect_identical('{"json": 1}' %>% spread_values(json = jnumber("json")),
+                   '{"json": 1}' %>% spread_values(y = jnumber("json")) %>% rename(json = y))
 
 })

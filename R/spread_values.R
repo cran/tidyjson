@@ -64,7 +64,8 @@ spread_values <- function(.x, ...) {
   json <- json_get(.x)
 
   # Get new values
-  new_values <- invoke_map(lst(...), .x = list(NULL), json)
+  fns <- lst(...)
+  new_values <- map(fns, function(f) f(json))
 
   # Add on new values
   y <- dplyr::bind_cols(.x, new_values)
@@ -79,8 +80,9 @@ spread_values <- function(.x, ...) {
 #' @keywords internal
 json_factory <- function(map.function) {
 
-  replace_nulls_na <- function(x)
-    if (is.null(x)) NA else x
+  replace_nulls_na <- function(x) {
+    if (length(x) == 0) NA else x
+  }
 
   function(..., recursive = FALSE) {
 
@@ -90,7 +92,6 @@ json_factory <- function(map.function) {
 
     # Return a closure to deal with JSON lists
     function(json) {
-
       json %>%
         purrr::map(path %>% as.list) %>%
         purrr::map(replace_nulls_na) %>%
@@ -105,7 +106,8 @@ json_factory <- function(map.function) {
 #' Navigates nested objects to get at names of a specific type, to be used as
 #' arguments to \code{\link{spread_values}}
 #'
-#' Note that these functions fail if they encounter the incorrect type.
+#' Note that these functions fail if they encounter the incorrect type. Note
+#' that \code{jnumber()} is an alias for \code{jdouble()}.
 #'
 #' @seealso \code{\link{spread_values}} for using these functions to spread
 #'          the values of a JSON object into new columns
@@ -120,12 +122,21 @@ NULL
 
 #' @rdname json_functions
 #' @export
-jstring <- json_factory(map_chr)
+jstring <- json_factory(purrr::map_chr)
 
 #' @rdname json_functions
 #' @export
-jnumber <- json_factory(map_dbl)
+jlogical <- json_factory(purrr::map_lgl)
 
 #' @rdname json_functions
 #' @export
-jlogical <- json_factory(map_lgl)
+jinteger <- json_factory(purrr::map_int)
+
+#' @rdname json_functions
+#' @export
+jdouble <- json_factory(purrr::map_dbl)
+
+#' @rdname json_functions
+#' @export
+jnumber <- jdouble
+
