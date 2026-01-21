@@ -1,9 +1,9 @@
-## ---- echo = FALSE, message = FALSE-------------------------------------------
+## ----echo = FALSE, message = FALSE--------------------------------------------
 knitr::opts_chunk$set(collapse = T, comment = "#>")
 knitr::opts_chunk$set(fig.width = 7, fig.height = 5)
 options(tibble.print_min = 4L, tibble.print_max = 4L)
 
-## ---- message = FALSE---------------------------------------------------------
+## ----message = FALSE----------------------------------------------------------
 library(jsonlite)
 library(dplyr)
 library(purrr)
@@ -55,7 +55,7 @@ co_names
 ## -----------------------------------------------------------------------------
 co_names %$% wordcloud(name, ndoc, scale = c(1.5, .1), min.freq = 100)
 
-## ---- fig.height = 9----------------------------------------------------------
+## ----fig.height = 9-----------------------------------------------------------
 co_names %>%
   ungroup %>%
   group_by(type) %>%
@@ -144,7 +144,7 @@ plot_json_graph <- function(.x, legend = TRUE, vertex.size = 6,
 ## -----------------------------------------------------------------------------
 co_examp %>% plot_json_graph
 
-## ---- fig.height = 8----------------------------------------------------------
+## ----fig.height = 8-----------------------------------------------------------
 plot_json_graph_panel <- function(json, nrow, ncol, ...) {
   
   # Set up grid
@@ -162,7 +162,7 @@ plot_json_graph_panel <- function(json, nrow, ncol, ...) {
   invisible(NULL)
 }
 
-## ---- fig.height = 8----------------------------------------------------------
+## ----fig.height = 8-----------------------------------------------------------
 plot_json_graph_panel(companies %>% sample(5), 7, 6, legend = FALSE, show.labels = FALSE,
                       vertex.size = 4)
 

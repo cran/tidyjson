@@ -1,9 +1,9 @@
-## ---- echo = FALSE, message = FALSE-------------------------------------------
+## ----echo = FALSE, message = FALSE--------------------------------------------
 knitr::opts_chunk$set(collapse = T, comment = "#>")
 options(tibble.print_min = 4L, tibble.print_max = 4L)
 library(tidyjson)
 
-## ---- message = FALSE---------------------------------------------------------
+## ----message = FALSE----------------------------------------------------------
 library(dplyr)
 
 # Define a simple people JSON collection
@@ -23,13 +23,13 @@ worldbank %>% spread_all
 ## -----------------------------------------------------------------------------
 worldbank %>% spread_all %>% select(regionname, totalamt)
 
-## ---- echo = FALSE, message = FALSE-------------------------------------------
+## ----echo = FALSE, message = FALSE--------------------------------------------
 options(tibble.print_min = 10L, tibble.print_max = 10L)
 
 ## -----------------------------------------------------------------------------
 worldbank %>% gather_object %>% json_types %>% count(name, type)
 
-## ---- echo = FALSE, message = FALSE-------------------------------------------
+## ----echo = FALSE, message = FALSE--------------------------------------------
 options(tibble.print_min = 4L, tibble.print_max = 4L)
 
 ## -----------------------------------------------------------------------------
@@ -74,9 +74,11 @@ json %>% gather_object("year") %>% append_values_number("count")
 ## -----------------------------------------------------------------------------
 worldbank %>% as.tbl_json
 
-## ---- error = TRUE------------------------------------------------------------
+## ----error = TRUE-------------------------------------------------------------
+try({
 bad_json <- '{"key": "value"'
 bad_json %>% as.tbl_json
+})
 
 ## -----------------------------------------------------------------------------
 issues %>% as.tbl_json
